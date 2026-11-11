@@ -17,11 +17,18 @@ SYSTEM_PROMPT = (
     "You have access to tools/functions. To use a tool, you MUST call the "
     "function via the provided tool-calling interface. Do NOT output JSON "
     "or code blocks – use the tool-calling mechanism directly. "
-    "ONLY use a tool if the user explicitly asks about customers, tickets, or metrics. "
-    "If a question involves both customers and tickets (e.g., 'How many inactive customers have open high priority tickets?'), "
-    "you can and should call MULTIPLE tools: call get_crm_data with the customer filters, and call get_support_tickets with the ticket filters. "
-    "For general questions (like capital cities, jokes, weather), answer directly without tools. "
-    "Always use the tool‑calling interface – never output JSON manually."
+    "ONLY use a tool if the user explicitly asks about customers, tickets, or metrics.\n\n"
+    "Domain Data Rules:\n"
+    "1. Customers (CRM) have status: 'active' or 'inactive'.\n"
+    "2. Support tickets have status: 'open' or 'closed', and priority: 'low', 'medium', or 'high'. "
+    "Tickets are NEVER 'active' or 'inactive' – active/inactive applies ONLY to customers in CRM.\n"
+    "3. When a query asks about inactive customers and tickets (e.g. 'inactive tickets', 'inactive customers with tickets', 'inactive customers with high priority tickets'): "
+    "you MUST call MULTIPLE tools: call get_crm_data(status='inactive') AND call get_support_tickets(...). "
+    "The system will automatically correlate them by customer_id.\n"
+    "4. For get_support_tickets, only set status to 'open' or 'closed' if the user EXPLICITLY requested open or closed tickets. "
+    "If the user did not say 'open' or 'closed', DO NOT set status to 'open' (omit status so all matching tickets are retrieved).\n"
+    "5. For general questions (like capital cities, jokes, weather), answer directly without tools.\n"
+    "Always use the tool-calling interface – never output JSON manually."
 )
 
 CORRECTION_PROMPT = (
@@ -232,7 +239,13 @@ SCHEMA = {
 
 # Entity-grounded intent routing
 from app.services.intent_router import is_data_query, classify_intent, Intent
-from app.services.abstention_router import evaluate_abstention, Decision
+from app.services.abstention_router import evaluate_abstention, Decision, validate_decision
+from app.services.clarification_context import (
+    clarification_store,
+    consume_pending_sync,
+    store_pending_sync,
+    resolve_followup,
+)
 
 # Preserved for backward compatibility
 DATA_KEYWORDS = [
@@ -336,6 +349,9 @@ def _coerce_args(func_name: str, args: dict) -> dict:
                             coerced["status"] = "closed"
                         elif "open" in s:
                             coerced["status"] = "open"
+                        elif any(w in s for w in ["inactive", "active", "churn"]):
+                            # Inactive / active applies to customer status, not support tickets
+                            coerced.pop("status", None)
                     elif func_name == "get_crm_data":
                         if any(w in s for w in ["inactive", "churn", "disabled"]):
                             coerced["status"] = "inactive"
@@ -440,18 +456,58 @@ class LLMOrchestrator:
             "get_analytics": AnalyticsConnector(),
         }
 
+        # Hard invariant: Ensure connector_map strictly matches registered operational TOOLS
+        tool_names = {t["function"]["name"] for t in TOOLS}
+        conn_names = set(self.connector_map.keys())
+        if tool_names != conn_names:
+            missing_conn = tool_names - conn_names
+            extra_conn = conn_names - tool_names
+            err_parts = []
+            if missing_conn:
+                err_parts.append(f"Tools missing connectors: {sorted(missing_conn)}")
+            if extra_conn:
+                err_parts.append(f"Connectors without tool schema: {sorted(extra_conn)}")
+            raise RuntimeError(f"Tool registry and connector_map mismatch: {'; '.join(err_parts)}")
+
     def _execute_tool_calls(
         self,
         tool_calls: List[Dict],
         detected_intent: Optional[Intent] = None,
+        user_text: str = "",
     ) -> tuple[str, dict]:
         """Process a list of tool calls and return (answer_text, metadata)."""
+        user_lower = (user_text or "").lower()
+        has_inactive_mention = any(w in user_lower for w in ["inactive", "churn"])
+        has_ticket_mention = any(w in user_lower for w in ["ticket", "tickets", "support"])
+
+        # Auto-complete cross-domain query if user asked about inactive customers and tickets
+        tool_names = [call.get("function", {}).get("name") for call in tool_calls]
+        if has_inactive_mention and has_ticket_mention:
+            if "get_crm_data" not in tool_names:
+                tool_calls.append({
+                    "function": {
+                        "name": "get_crm_data",
+                        "arguments": {"status": "inactive"}
+                    }
+                })
+            # Ensure get_support_tickets does not have an unintended status="open" or "closed" if user didn't specify it
+            if "open" not in user_lower and "close" not in user_lower:
+                for call in tool_calls:
+                    if call.get("function", {}).get("name") == "get_support_tickets":
+                        call_args = call.get("function", {}).get("arguments", {})
+                        if isinstance(call_args, dict) and call_args.get("status") in ("open", "closed"):
+                            call_args.pop("status", None)
+
         INTENT_TOOL_MAP = {
             Intent.CRM_QUERY: ["get_crm_data"],
             Intent.SUPPORT_QUERY: ["get_support_tickets"],
             Intent.ANALYTICS_QUERY: ["get_analytics"],
             Intent.MULTI_DOMAIN_QUERY: ["get_crm_data", "get_support_tickets", "get_analytics"],
         }
+
+        # If cross-domain query was formed, permit all necessary tools
+        if has_inactive_mention and has_ticket_mention:
+            detected_intent = Intent.MULTI_DOMAIN_QUERY
 
         answers = []
         sources_used = []
@@ -465,8 +521,34 @@ class LLMOrchestrator:
         overall_retry_count = 0
         overall_retry_succeeded = False
 
+        # Deduplicate tool calls so identical function calls are not executed multiple times
+        deduped_tool_calls = []
+        seen_calls = set()
         for call in tool_calls:
-            func_name = call["function"]["name"]
+            fname = call.get("function", {}).get("name")
+            fargs = call.get("function", {}).get("arguments", {})
+            try:
+                args_repr = json.dumps(fargs, sort_keys=True)
+            except Exception:
+                args_repr = str(fargs)
+            key = (fname, args_repr)
+            if key not in seen_calls:
+                seen_calls.add(key)
+                deduped_tool_calls.append(call)
+        tool_calls = deduped_tool_calls
+        valid_tool_names = {t["function"]["name"] for t in TOOLS}
+
+        for call in tool_calls:
+            func_name = call.get("function", {}).get("name")
+
+            # Tool existence boundary check
+            if func_name not in valid_tool_names:
+                err_meta = _empty_metadata()
+                err_meta.update({
+                    "tool_selection_error": f"Tool '{func_name}' is not a recognized operational tool.",
+                    "failure_type": "invalid_tool_name",
+                })
+                return f"Sorry, tool '{func_name}' is not recognized.", err_meta
 
             # Intent vs Tool alignment check (Section 17)
             if detected_intent in INTENT_TOOL_MAP:
@@ -591,6 +673,9 @@ class LLMOrchestrator:
                 "records": correlated_records,
             })
 
+        if correlated_records:
+            total_results = len(correlated_records)
+
         source_last_updated = max(source_timestamps) if source_timestamps else "unknown"
         now_iso = datetime.now(timezone.utc).isoformat()
         metadata = {
@@ -608,7 +693,7 @@ class LLMOrchestrator:
         }
         return final_answer_text, metadata
 
-    def process_query(self, user_text: str, enable_abstention: bool = True) -> dict:
+    def process_query(self, user_text: str, enable_abstention: bool = True, session_id: Optional[str] = None) -> dict:
         # --- Correction pass: fix likely STT garbling against known domain
         # vocabulary before any routing decision is made. ---
         t_corr_start = time.perf_counter()
@@ -616,9 +701,36 @@ class LLMOrchestrator:
         corr_latency_ms = int((time.perf_counter() - t_corr_start) * 1000)
         corrected_text = corr["text"]
 
+        # Check for one-turn bounded clarification context carry-forward
+        resolved_context = None
+        effective_text = corrected_text
+        if enable_abstention and session_id:
+            pending = consume_pending_sync(session_id)
+            if pending:
+                resolved = resolve_followup(pending, corrected_text)
+                if resolved:
+                    resolved_query, target_tool, resolved_args = resolved
+                    effective_text = resolved_query
+                    resolved_context = {
+                        "carried_forward": True,
+                        "pending_domain": pending.matched_domains[0] if pending.matched_domains else None,
+                        "pending_target_tool": target_tool,
+                        "resolved_query": resolved_query,
+                        "resolved_args": resolved_args,
+                    }
+                else:
+                    # Unrelated or non-resolving follow-up: pending context consumed/discarded
+                    resolved_context = {
+                        "carried_forward": False,
+                        "pending_domain": pending.matched_domains[0] if pending.matched_domains else None,
+                        "cleared_unrelated": True,
+                    }
+
         def _apply_corr_meta(meta: dict) -> dict:
             meta["raw_transcript"] = user_text
             meta["corrected_transcript"] = corrected_text
+            if resolved_context:
+                meta["clarification_context"] = resolved_context
             meta["correction_attempted"] = corr["correction_attempted"]
             meta["correction_changed"] = corr["correction_changed"]
             meta["correction_accepted"] = corr["correction_accepted"]
@@ -639,7 +751,11 @@ class LLMOrchestrator:
             abstention_latency_ms = 0
 
             if enable_abstention:
-                abs_res = evaluate_abstention(corrected_text, threshold=0.50)
+                abs_res = evaluate_abstention(effective_text, threshold=0.50)
+                validated_decision = validate_decision(abs_res)
+                if abs_res.decision != validated_decision:
+                    abs_res.decision = validated_decision
+
                 abstention_latency_ms = int((time.perf_counter() - t_rout_start) * 1000)
                 routing_latency_ms = abstention_latency_ms
                 detected_intent = abs_res.intent
@@ -664,8 +780,48 @@ class LLMOrchestrator:
                         "metadata": metadata
                     }
 
+                if abs_res.decision == Decision.CLARIFY:
+                    if session_id:
+                        store_pending_sync(
+                            session_id=session_id,
+                            matched_domains=abs_res.matched_domains,
+                            reason=abs_res.reason,
+                            target_tool=abs_res.target_tool,
+                        )
+                    metadata = _apply_corr_meta(_empty_metadata())
+                    metadata.update({
+                        "classified_intent": detected_intent.value,
+                        "abstention_decision": "CLARIFY",
+                        "abstention_reason": abs_res.reason,
+                        "abstention_confidence": abs_res.confidence,
+                        "execution_prevented_by_abstention": True,
+                        "correction_latency_ms": corr_latency_ms,
+                        "routing_latency_ms": routing_latency_ms,
+                        "abstention_latency_ms": abstention_latency_ms,
+                        "tool_latency_ms": 0,
+                    })
+                    if session_id:
+                        metadata["clarification_context"] = {
+                            "has_pending": True,
+                            "target_tool": abs_res.target_tool,
+                            "matched_domains": abs_res.matched_domains,
+                        }
+                    answer = f"Could you please clarify your request? {abs_res.reason}"
+                    return {
+                        "answer": answer,
+                        "metadata": metadata
+                    }
+
                 if abs_res.decision == Decision.DIRECT:
-                    # Non-domain query, direct conversation without tools
+                    # Non-domain query, direct conversation without tools.
+                    # Build abs_meta first so the except block can inject it on failure.
+                    abs_meta = {
+                        "abstention_decision": "DIRECT",
+                        "abstention_reason": abs_res.reason,
+                        "abstention_confidence": abs_res.confidence,
+                        "execution_prevented_by_abstention": False,
+                        "abstention_latency_ms": abstention_latency_ms,
+                    }
                     t_llm_start = time.perf_counter()
                     response = self.client.chat(
                         model=self.model,
@@ -674,17 +830,14 @@ class LLMOrchestrator:
                             {"role": "user", "content": corrected_text + " (Answer directly, no tools or APIs.)"}
                         ],
                     )
+                    tool_latency_ms = int((time.perf_counter() - t_llm_start) * 1000)
                     metadata = _apply_corr_meta(_empty_metadata())
+                    metadata.update(abs_meta)
                     metadata.update({
                         "classified_intent": detected_intent.value,
-                        "abstention_decision": "DIRECT",
-                        "abstention_reason": abs_res.reason,
-                        "abstention_confidence": abs_res.confidence,
-                        "execution_prevented_by_abstention": False,
                         "correction_latency_ms": corr_latency_ms,
                         "routing_latency_ms": routing_latency_ms,
-                        "abstention_latency_ms": abstention_latency_ms,
-                        "tool_latency_ms": 0,
+                        "tool_latency_ms": tool_latency_ms,
                     })
                     return {
                         "answer": response["message"]["content"],
@@ -741,7 +894,7 @@ class LLMOrchestrator:
                     model=self.model,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": corrected_text},
+                        {"role": "user", "content": effective_text},
                     ],
                     tools=TOOLS,
                 )
@@ -771,7 +924,7 @@ class LLMOrchestrator:
             tool_calls = message.get("tool_calls")
 
             if tool_calls:
-                answer, metadata = self._execute_tool_calls(tool_calls, detected_intent=detected_intent)
+                answer, metadata = self._execute_tool_calls(tool_calls, detected_intent=detected_intent, user_text=effective_text)
                 tool_latency_ms = int((time.perf_counter() - t_tool_start) * 1000)
                 metadata.update(abs_meta)
                 metadata["classified_intent"] = detected_intent.value
@@ -787,7 +940,24 @@ class LLMOrchestrator:
                     {"function": {"name": c["name"], "arguments": c["arguments"]}}
                     for c in extracted_calls
                 ]
-                answer, metadata = self._execute_tool_calls(synthetic_calls, detected_intent=detected_intent)
+                answer, metadata = self._execute_tool_calls(synthetic_calls, detected_intent=detected_intent, user_text=effective_text)
+                tool_latency_ms = int((time.perf_counter() - t_tool_start) * 1000)
+                metadata.update(abs_meta)
+                metadata["classified_intent"] = detected_intent.value
+                metadata["correction_latency_ms"] = corr_latency_ms
+                metadata["routing_latency_ms"] = routing_latency_ms
+                metadata["tool_latency_ms"] = tool_latency_ms
+                return {"answer": answer, "metadata": _apply_corr_meta(metadata)}
+
+            # If LLM did not generate tool calls but clarification context resolved an explicit tool call
+            if resolved_context and resolved_context.get("carried_forward"):
+                candidate_calls = [{
+                    "function": {
+                        "name": resolved_context["pending_target_tool"],
+                        "arguments": resolved_context["resolved_args"]
+                    }
+                }]
+                answer, metadata = self._execute_tool_calls(candidate_calls, detected_intent=detected_intent, user_text=effective_text)
                 tool_latency_ms = int((time.perf_counter() - t_tool_start) * 1000)
                 metadata.update(abs_meta)
                 metadata["classified_intent"] = detected_intent.value

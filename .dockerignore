@@ -1,0 +1,34 @@
+# ── Secrets ──────────────────────────────────────────────────────────────────
+# Never copy .env into the image; pass secrets via docker-compose env_file or
+# environment variables at runtime.
+.env
+
+# ── Virtual environment ───────────────────────────────────────────────────────
+# The image installs deps via pip inside the container; the local venv must
+# not be included (it may be gigabytes and will shadow the container install).
+venv/
+.venv/
+
+# ── Large generated/cached files ──────────────────────────────────────────────
+benchmark_audio/
+model_cache/
+temp_audio/
+experiments/
+
+# ── Python bytecode ───────────────────────────────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ── Test artifacts ────────────────────────────────────────────────────────────
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ── Development-only files ────────────────────────────────────────────────────
+*.bak.*
+.git/
+.gitignore
+docs/
+reports/

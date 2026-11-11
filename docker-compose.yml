@@ -1,20 +1,66 @@
-version: '3.8'
+# ============================================================
+# Privacy-Preserving Voice Data Assistant — Docker Compose
+# ============================================================
+#
+# Services started by this file:
+#   app    — the FastAPI application (port 8000)
+#   redis  — Redis 7 for multi-worker audio/clarification state (port 6379)
+#   ollama — local LLM server (port 11434)
+#
+# Quick start:
+#   1. Copy .env.example to .env and set API_KEY to a strong secret.
+#   2. docker compose up --build
+#   3. Open http://localhost:8000 in your browser.
+#   4. Pull an Ollama model in a separate terminal:
+#        docker exec <ollama-container> ollama pull llama3.2:latest
+#
+# TTS note — see Dockerfile for details:
+#   TTS_PROVIDER=remote uses edge-tts (internet required, non-sensitive text only).
+#   Set TTS_PROVIDER=disabled to skip audio responses entirely.
+#   ALLOW_REMOTE_TTS_FOR_SENSITIVE_DATA must remain false (default).
+# ============================================================
 
 services:
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    restart: unless-stopped
+
   app:
     build: .
     ports:
       - "8000:8000"
+    env_file:
+      - .env                         # API_KEY and other secrets go here
     environment:
-      - OLLAMA_HOST=http://ollama:11434
+      - STORAGE_BACKEND=redis
+      - REDIS_URL=redis://redis:6379/0
+      - OLLAMA_MODEL=llama3.2:latest
+      # TTS_PROVIDER=local is unavailable in Linux containers (requires Windows SAPI5).
+      # Use "remote" (edge-tts) or "disabled" (transcript-only).
+      - TTS_PROVIDER=remote
+      - ALLOW_REMOTE_TTS_FOR_SENSITIVE_DATA=false
     depends_on:
-      - ollama
-  ollama:
-    image: ollama/ollama:latest
-    volumes:
-      - ollama_data:/root/.ollama
-    ports:
-      - "11434:11434"
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    restart: unless-stopped
 
 volumes:
   ollama_data:

@@ -1,20 +1,34 @@
+from contextlib import asynccontextmanager
 import os
 from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
 import logging
 
 from app.config import settings
 from app.failure import PipelineError
-from app.routers import health, data, voice
+from app.routers import health, data, voice, evaluation
+from app.storage import factory as storage_factory
 from app.utils.logging import configure_logging
 
 configure_logging()
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title=settings.APP_NAME)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Initialize application-scoped resources on the active ASGI event loop
+    logger.info("Application starting up with model STT=%s, LLM=%s", settings.STT_MODEL, settings.OLLAMA_MODEL)
+    voice.init_audio_semaphore(app, max_concurrent=settings.MAX_CONCURRENT_VOICE_REQUESTS)
+    await storage_factory.init_storage(settings)
+    yield
+    # Graceful shutdown cleanup if needed
+    logger.info("Application shutting down")
+    await storage_factory.close_storage()
+
+
+app = FastAPI(title=settings.APP_NAME, lifespan=lifespan)
 
 # Configurable CORS origins (defaulting to localhost origins for local dev)
 allowed_origins = [o.strip() for o in settings.ALLOWED_ORIGINS.split(",") if o.strip()]
@@ -46,17 +60,13 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 
-@app.on_event("startup")
-def on_startup():
-    logger.info("Application starting up with model STT=%s, LLM=%s", settings.STT_MODEL, settings.OLLAMA_MODEL)
+
 
 
 app.include_router(health.router)
 app.include_router(data.router)
 app.include_router(voice.router)
-
-os.makedirs("temp_audio", exist_ok=True)
-app.mount("/static", StaticFiles(directory="temp_audio"), name="static")
+app.include_router(evaluation.router)
 
 CHAT_UI_PATH = Path(__file__).resolve().parent.parent / "voice_chat.html"
 

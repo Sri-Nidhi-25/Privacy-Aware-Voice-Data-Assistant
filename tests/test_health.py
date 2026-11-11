@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_health.py - Tests for liveness, readiness, and degraded health states.
 """
 from fastapi.testclient import TestClient

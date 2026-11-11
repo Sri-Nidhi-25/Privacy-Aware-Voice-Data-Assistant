@@ -25,13 +25,14 @@ from app.services.intent_router import Intent
 class Decision(Enum):
     EXECUTE = "EXECUTE"
     ABSTAIN = "ABSTAIN"
+    CLARIFY = "CLARIFY"
     DIRECT = "DIRECT"
 
 
 @dataclass
 class AbstentionResult:
     intent: Intent
-    route: str                    # "tool", "direct", or "abstain"
+    route: str                    # "tool", "direct", "clarify", or "abstain"
     decision: Decision
     confidence: float             # Calibrated evidence score [0.0, 1.0]
     domain_evidence: float
@@ -43,7 +44,7 @@ class AbstentionResult:
 
 
 # 1. Domain Entities
-CRM_ENTITIES = re.compile(r"\b(customer|customers|crm|client|clients|account|accounts|roster|patron|patrons)\b", re.IGNORECASE)
+CRM_ENTITIES = re.compile(r"\b(customer|customers|crm|client|clients|account|accounts|roster|patron|patrons|inactive|churn(ed)?)\b", re.IGNORECASE)
 SUPPORT_ENTITIES = re.compile(r"\b(ticket|tickets|support\s+tickets?|support\s+issue|support\s+issues|support\s+cases?|support\s+queue|helpdesk|grievance|grievances)\b", re.IGNORECASE)
 ANALYTICS_ENTITIES = re.compile(r"\b(daily\s+active\s+users?|dau|analytics|user\s+metrics?|metrics?\s+trend|metric|engagement|retention|active\s+users?(\s+daily)?)\b", re.IGNORECASE)
 
@@ -74,6 +75,48 @@ NON_OPERATIONAL_DISTRACTORS = [
     re.compile(r"^(write\s+a\s+(python\s+script|poem|letter|summary)|draft\s+a|compare\s+(zendesk|salesforce))\b", re.IGNORECASE),
 ]
 
+# 4. Pragmatic Semantic Conflict Markers
+NEGATED_DIRECTIVES = re.compile(
+    r"\b(do\s+not|don't|dont|never|stop|refrain\s+from|avoid)\s+(show|list|get|give|display|fetch|pull|retrieve|find|query|check|look\s+up|run|call)\b|\b(do\s+not|don't|dont)\s+want\s+(to\s+see|any|to\s+view|to\s+check)\b",
+    re.IGNORECASE
+)
+
+CONVERSATIONAL_CANCELLATIONS = re.compile(
+    r"\b(wait\s+no|cancel\s+that|never\s+mind|nevermind|scratch\s+that|forget\s+it|don't\s+check\s+right\s+now|do\s+not\s+check\s+right\s+now)\b",
+    re.IGNORECASE
+)
+
+HYPOTHETICAL_INQUIRIES = re.compile(
+    r"\b(what\s+if(\s+we\s+were\s+to)?|suppose\s+we|imagining\s+if|hypothetically|in\s+theory)\b",
+    re.IGNORECASE
+)
+
+CONVERSATIONAL_MENTIONS = re.compile(
+    r"\b(becoming\s+a\s+(real\s+)?(headache|problem|pain|nightmare)|real\s+headache|frustrating\s+for|struggling\s+with)\b",
+    re.IGNORECASE
+)
+
+UNDERSPECIFIED_REQUESTS = re.compile(
+    r"\b(something\s+about|maybe\s+check\s+them|or\s+whatever|some\s+stuff\s+about)\b",
+    re.IGNORECASE
+)
+
+
+def validate_decision(result: AbstentionResult) -> Decision:
+    """
+    Validates that a decision adheres to the strict Decision schema.
+    Fails closed to Decision.ABSTAIN if result is invalid, corrupted, or contradictory.
+    """
+    if not isinstance(result, AbstentionResult):
+        return Decision.ABSTAIN
+    if not isinstance(result.decision, Decision):
+        return Decision.ABSTAIN
+    # Contradictory check: EXECUTE must have operational_evidence > 0 and distractor_penalty == 0
+    if result.decision == Decision.EXECUTE:
+        if result.distractor_penalty > 0 or result.operational_evidence <= 0:
+            return Decision.ABSTAIN
+    return result.decision
+
 
 def evaluate_abstention(text: str, threshold: float = 0.50) -> AbstentionResult:
     """
@@ -101,14 +144,44 @@ def evaluate_abstention(text: str, threshold: float = 0.50) -> AbstentionResult:
 
     operational_evidence = min(1.0, max(op_directive_score, op_interrogative_score) + op_filter_score)
 
-    # Step 3: Compute Distractor Penalty
+    # Step 3: Compute Distractor Penalty & Pragmatic Cues
     distractor_penalty = 0.0
-    matched_distractor_pattern = None
-    for pattern in NON_OPERATIONAL_DISTRACTORS:
-        if pattern.search(lowered):
-            distractor_penalty = 1.0
-            matched_distractor_pattern = pattern.pattern
-            break
+    matched_distractor_reason = None
+
+    # Check for underspecified / ambiguous requests requiring clarification
+    if domain_evidence > 0.0 and UNDERSPECIFIED_REQUESTS.search(lowered):
+        return AbstentionResult(
+            intent=Intent.AMBIGUOUS,
+            route="clarify",
+            decision=Decision.CLARIFY,
+            confidence=0.35,
+            domain_evidence=domain_evidence,
+            operational_evidence=operational_evidence,
+            distractor_penalty=0.5,
+            target_tool=None,
+            matched_domains=matched_domains,
+            reason="Ambiguous or underspecified request; clarification required before tool execution.",
+        )
+
+    # Check for explicit negation applied to directive
+    if NEGATED_DIRECTIVES.search(lowered):
+        distractor_penalty = 1.0
+        matched_distractor_reason = "Explicitly negated directive prohibiting tool execution."
+    elif CONVERSATIONAL_CANCELLATIONS.search(lowered):
+        distractor_penalty = 1.0
+        matched_distractor_reason = "User trailing cancellation retracted request."
+    elif HYPOTHETICAL_INQUIRIES.search(lowered):
+        distractor_penalty = 1.0
+        matched_distractor_reason = "Hypothetical inquiry; no live data execution permitted."
+    elif CONVERSATIONAL_MENTIONS.search(lowered):
+        distractor_penalty = 1.0
+        matched_distractor_reason = "Mention or commentary about domain entities without operational request."
+    else:
+        for pattern in NON_OPERATIONAL_DISTRACTORS:
+            if pattern.search(lowered):
+                distractor_penalty = 1.0
+                matched_distractor_reason = "Contextual non-operational distractor cue matched."
+                break
 
     # Step 4: No domain entities detected -> Standard DIRECT
     if domain_evidence == 0.0:
@@ -192,7 +265,7 @@ def evaluate_abstention(text: str, threshold: float = 0.50) -> AbstentionResult:
             distractor_penalty=distractor_penalty,
             target_tool=None,
             matched_domains=matched_domains,
-            reason=f"Semantic distractor detected; abstaining from tool execution.",
+            reason=matched_distractor_reason or "Semantic distractor detected; abstaining from tool execution.",
         )
 
     if confidence >= threshold and operational_evidence > 0.0:

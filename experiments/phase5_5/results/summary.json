@@ -1,0 +1,237 @@
+{
+  "timestamp": "2026-10-27T10:20:37.525338+00:00",
+  "sample_size": 6,
+  "comparison_table": {
+    "metric": [
+      "Total Cases",
+      "Coverage",
+      "Unsafe Execution Rate",
+      "Risk",
+      "Selective Accuracy",
+      "Safe Abstention Rate",
+      "Distractor FPR",
+      "Overall Task Success"
+    ],
+    "baseline": [
+      6,
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0,
+      0.5
+    ],
+    "with_abstention": [
+      6,
+      0.5,
+      0.0,
+      0.0,
+      1.0,
+      1.0,
+      0.0,
+      1.0
+    ]
+  },
+  "acoustic_degradation": {
+    "with_abstention": {
+      "clean": {
+        "sample_size": 6,
+        "mean_wer": 0.0,
+        "mean_cer": 0.0,
+        "mean_logprob": -0.2723,
+        "routing_retention_rate": 1.0,
+        "unsafe_execution_rate": 0.0,
+        "task_success_rate": 1.0
+      }
+    },
+    "baseline": {
+      "clean": {
+        "sample_size": 6,
+        "mean_wer": 0.0,
+        "mean_cer": 0.0,
+        "mean_logprob": -0.2723,
+        "routing_retention_rate": 0.0,
+        "unsafe_execution_rate": 0.5,
+        "task_success_rate": 0.0
+      }
+    }
+  },
+  "latency_profiles": {
+    "validation": {
+      "count": 6,
+      "mean_ms": 1455.7,
+      "p50_ms": 52.5,
+      "p90_ms": 4300.5,
+      "p95_ms": 6388.2
+    },
+    "obfuscation": {
+      "count": 6,
+      "mean_ms": 2094.3,
+      "p50_ms": 2090.0,
+      "p90_ms": 2678.0,
+      "p95_ms": 2728.0
+    },
+    "stt": {
+      "count": 6,
+      "mean_ms": 15122.3,
+      "p50_ms": 9802.0,
+      "p90_ms": 27833.0,
+      "p95_ms": 28004.5
+    },
+    "correction": {
+      "count": 6,
+      "mean_ms": 11074.3,
+      "p50_ms": 2066.5,
+      "p90_ms": 29814.0,
+      "p95_ms": 30163.5
+    },
+    "routing": {
+      "count": 6,
+      "mean_ms": 9.3,
+      "p50_ms": 2.0,
+      "p90_ms": 26.0,
+      "p95_ms": 38.0
+    },
+    "abstention": {
+      "count": 6,
+      "mean_ms": 9.3,
+      "p50_ms": 2.0,
+      "p90_ms": 26.0,
+      "p95_ms": 38.0
+    },
+    "tool": {
+      "count": 6,
+      "mean_ms": 4314.0,
+      "p50_ms": 978.0,
+      "p90_ms": 11964.0,
+      "p95_ms": 16734.5
+    },
+    "tts": {
+      "count": 6,
+      "mean_ms": 120.0,
+      "p50_ms": 120.0,
+      "p90_ms": 120.0,
+      "p95_ms": 120.0
+    },
+    "total": {
+      "count": 6,
+      "mean_ms": 34084.5,
+      "p50_ms": 14999.5,
+      "p90_ms": 75472.5,
+      "p95_ms": 82974.2
+    }
+  },
+  "error_propagation": {
+    "with_abstention": {
+      "ordered_stages": [
+        "STT",
+        "Correction",
+        "Routing",
+        "Abstention",
+        "Tool Selection",
+        "Arguments",
+        "Connector"
+      ],
+      "table": {
+        "STT": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Correction": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Routing": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Abstention": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 3,
+          "unsafe_outcomes": 0
+        },
+        "Tool Selection": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Arguments": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Connector": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        }
+      }
+    },
+    "baseline": {
+      "ordered_stages": [
+        "STT",
+        "Correction",
+        "Routing",
+        "Abstention",
+        "Tool Selection",
+        "Arguments",
+        "Connector"
+      ],
+      "table": {
+        "STT": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Correction": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Routing": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Abstention": {
+          "errors_entering": 0,
+          "errors_created": 3,
+          "errors_contained": 0,
+          "unsafe_outcomes": 3
+        },
+        "Tool Selection": {
+          "errors_entering": 3,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 3
+        },
+        "Arguments": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        },
+        "Connector": {
+          "errors_entering": 0,
+          "errors_created": 0,
+          "errors_contained": 0,
+          "unsafe_outcomes": 0
+        }
+      }
+    }
+  }
+}

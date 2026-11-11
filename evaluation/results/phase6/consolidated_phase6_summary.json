@@ -1,0 +1,117 @@
+{
+  "total_cases_evaluated": 38,
+  "real_human_audio_cases": 6,
+  "benchmark_voice_cases": 32,
+  "baseline_metrics": {
+    "n_total": 38,
+    "n_operational": 33,
+    "n_distractor": 5,
+    "n_executed": 33,
+    "coverage": {
+      "overall": {
+        "k": 33,
+        "n": 38,
+        "rate": 0.8684,
+        "formatted": "33/38 (86.8%) [95% CI: 72.7% - 94.2%]"
+      },
+      "operational": {
+        "k": 33,
+        "n": 33,
+        "rate": 1.0,
+        "formatted": "33/33 (100.0%) [95% CI: 89.6% - 100.0%]"
+      },
+      "distractor": {
+        "k": 0,
+        "n": 5,
+        "rate": 0.0,
+        "formatted": "0/5 (0.0%) [95% CI: 0.0% - 43.5%]"
+      }
+    },
+    "selective_risk": {
+      "k": 0,
+      "n": 33,
+      "rate": 0.0,
+      "formatted": "0/33 (0.0%) [95% CI: 0.0% - 10.4%]"
+    },
+    "false_positive_tool_execution": {
+      "k": 0,
+      "n": 5,
+      "rate": 0.0,
+      "formatted": "0/5 (0.0%) [95% CI: 0.0% - 43.5%]"
+    },
+    "missed_valid_requests": {
+      "k": 0,
+      "n": 33,
+      "rate": 0.0,
+      "formatted": "0/33 (0.0%) [95% CI: 0.0% - 10.4%]",
+      "breakdown_by_stage": {}
+    },
+    "task_success": {
+      "k": 38,
+      "n": 38,
+      "rate": 1.0,
+      "formatted": "38/38 (100.0%) [95% CI: 90.8% - 100.0%]"
+    },
+    "asr_metrics": {
+      "mean_wer": 0.0,
+      "mean_cer": 0.0
+    },
+    "failure_stage_counts": {}
+  },
+  "abstention_metrics": {
+    "n_total": 38,
+    "n_operational": 33,
+    "n_distractor": 5,
+    "n_executed": 33,
+    "coverage": {
+      "overall": {
+        "k": 33,
+        "n": 38,
+        "rate": 0.8684,
+        "formatted": "33/38 (86.8%) [95% CI: 72.7% - 94.2%]"
+      },
+      "operational": {
+        "k": 33,
+        "n": 33,
+        "rate": 1.0,
+        "formatted": "33/33 (100.0%) [95% CI: 89.6% - 100.0%]"
+      },
+      "distractor": {
+        "k": 0,
+        "n": 5,
+        "rate": 0.0,
+        "formatted": "0/5 (0.0%) [95% CI: 0.0% - 43.5%]"
+      }
+    },
+    "selective_risk": {
+      "k": 0,
+      "n": 33,
+      "rate": 0.0,
+      "formatted": "0/33 (0.0%) [95% CI: 0.0% - 10.4%]"
+    },
+    "false_positive_tool_execution": {
+      "k": 0,
+      "n": 5,
+      "rate": 0.0,
+      "formatted": "0/5 (0.0%) [95% CI: 0.0% - 43.5%]"
+    },
+    "missed_valid_requests": {
+      "k": 0,
+      "n": 33,
+      "rate": 0.0,
+      "formatted": "0/33 (0.0%) [95% CI: 0.0% - 10.4%]",
+      "breakdown_by_stage": {}
+    },
+    "task_success": {
+      "k": 38,
+      "n": 38,
+      "rate": 1.0,
+      "formatted": "38/38 (100.0%) [95% CI: 90.8% - 100.0%]"
+    },
+    "asr_metrics": {
+      "mean_wer": 0.0,
+      "mean_cer": 0.0
+    },
+    "failure_stage_counts": {}
+  }
+}

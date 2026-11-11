@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_routing.py - Tests for query classification and routing.
 """
 from app.services.llm_orchestrator import _is_data_query

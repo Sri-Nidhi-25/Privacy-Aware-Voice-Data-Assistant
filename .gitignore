@@ -1,6 +1,22 @@
+# Environments and secrets
 .env
 venv/
+.venv/
+
+# Bytecode and Python cache
+**/__pycache__/
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Audio caches and large assets
 temp_audio/
 benchmark_audio/
+model_cache/
+
+# Backup and temp files
+*.bak
+*.bak.*
+*.swp
+*~

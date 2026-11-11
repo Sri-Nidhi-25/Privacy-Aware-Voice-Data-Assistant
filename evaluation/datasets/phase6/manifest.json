@@ -1,0 +1,79 @@
+{
+  "phase": "Phase 6 — Real-Audio Reliability Evaluation",
+  "version": "1.0.0",
+  "date_created": "2026-10-27T12:45:00Z",
+  "status": "ACTIVE_EVALUATION",
+  "datasets": {
+    "real_audio_v1": {
+      "file": "evaluation/datasets/phase6/real_audio_v1.jsonl",
+      "sha256": "45d9712bf9726a7878bd89afa49f1d1e9ac98d4025ceae3721599d1a8955da8b",
+      "sample_size": 6,
+      "provenance": "authentic_human_recording",
+      "audio_source_dir": "data/audio",
+      "format": "mpeg",
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "speakers_count": 1,
+      "operational_count": 5,
+      "non_operational_count": 1,
+      "description": "Authentic human microphone recordings spoken by a human user covering CRM, support, analytics, and out-of-domain knowledge queries."
+    },
+    "benchmark_audio_v1": {
+      "file": "evaluation/datasets/phase6/benchmark_audio_v1.jsonl",
+      "sha256": "9fd559decfe9acb17fbdf612d60262b73ddcd313cb77d139b6c1d8ea888afc4f",
+      "sample_size": 32,
+      "provenance": "benchmark_phrase_recording",
+      "audio_source_dir": "benchmark_audio",
+      "format": "wav",
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "phrases_count": 8,
+      "acoustic_variants_per_phrase": 4,
+      "conditions": ["none", "mild", "medium", "strong"],
+      "operational_count": 28,
+      "non_operational_count": 4,
+      "description": "Standardized benchmark voice recordings covering 8 database and distractor prompts across 4 levels of formant-preserving obfuscation."
+    },
+    "semantic_conflict_v1": {
+      "file": "evaluation/datasets/phase6/semantic_conflict_v1.jsonl",
+      "sha256": "ca2e65cc961818253869e7522673a94cca0238b04ba92bbe46f948175b6b96c3",
+      "sample_size": 10,
+      "provenance": "text_challenge",
+      "format": "jsonl",
+      "operational_count": 5,
+      "non_operational_count": 5,
+      "description": "Semantic-conflict challenge dataset containing 5 paired cases (10 total): positive vs. negated, command vs. mention, operational vs. hypothetical, explicit vs. ambiguous, and uncorrected vs. cancelled intent."
+    },
+    "semantic_conflict_audio_v1": {
+      "file": "evaluation/datasets/phase6/semantic_conflict_audio_v1.jsonl",
+      "sha256": "6ed69d86d9e23310a2a3d811911e0a68958558a4ced207f16cbed513cd4829d6",
+      "sample_size": 10,
+      "provenance": "standardized_benchmark_recording",
+      "audio_source_dir": "benchmark_audio/phase6_1",
+      "format": "wav",
+      "sample_rate_hz": 16000,
+      "channels": 1,
+      "operational_count": 5,
+      "non_operational_count": 5,
+      "description": "Phase 6.1 paired audio evaluation corpus covering 5 semantic-conflict pairs (10 speech files): negation, mention-vs-command, hypothetical queries, underspecified/ambiguous requests, and trailing cancellations."
+    }
+  },
+  "collection_requirements": {
+    "target_sample_size": 100,
+    "current_authentic_human_count": 6,
+    "additional_recordings_required": 94,
+    "schema_file": "evaluation/datasets/phase6/collection_manifest_schema.json",
+    "recommended_splits": {
+      "development": 20,
+      "validation": 20,
+      "held_out_test": 60
+    },
+    "required_diversity_criteria": [
+      "Minimum 5 distinct speaker pseudonyms across balanced genders and accents",
+      "Acoustic noise variants: 20dB SNR and 10dB SNR room background noise",
+      "Semantic distractors mentioning database entities without operational verbs (min 20 cases)",
+      "Linguistic variations: negations, paraphrases, and boundary constraints (min 20 cases)",
+      "Ambiguous and underspecified requests requiring abstention or clarification (min 15 cases)"
+    ]
+  }
+}

@@ -50,7 +50,7 @@ ADVERSARIAL_DIRECT_PATTERNS = [
 
 # Domain entity regexes
 CRM_PATTERNS = [
-    re.compile(r"\b(customer|customers|crm|client|clients|account|accounts)\b", re.IGNORECASE),
+    re.compile(r"\b(customer|customers|crm|client|clients|account|accounts|inactive|churn(ed)?)\b", re.IGNORECASE),
 ]
 
 SUPPORT_PATTERNS = [
@@ -139,13 +139,13 @@ def classify_intent(text: str) -> IntentResult:
             reason="analytics_entity_detected",
         )
 
-    # Multiple domain entities detected (e.g. CRM and tickets together) -> ambiguous routing
+    # Multiple domain entities detected (e.g. CRM and tickets together) -> multi-domain query
     if len(entities) > 1:
         return IntentResult(
-            intent=Intent.AMBIGUOUS,
+            intent=Intent.MULTI_DOMAIN_QUERY,
             route="tool",
             target_tool=None,
-            confidence=0.5,
+            confidence=0.90 if has_action else 0.80,
             matched_entities=entities,
             reason="multiple_domain_entities_detected",
         )

@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_audio_validation.py - Tests for pre-processing audio validation.
 """
 from pathlib import Path

@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_obfuscation.py - Tests for voice obfuscation.
 """
 from pathlib import Path

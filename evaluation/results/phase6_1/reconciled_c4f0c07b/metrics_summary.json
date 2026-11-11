@@ -1,0 +1,151 @@
+{
+  "run_id": "reconciled_c4f0c07b",
+  "original_run_id": "c4f0c07b",
+  "note": "Forensically reconciled stage breakdown: sem_conf_aud_003 baseline localized to argument_validation_failure.",
+  "baseline_condition": {
+    "n_total": 10,
+    "n_operational": 5,
+    "n_distractor": 5,
+    "n_executed": 9,
+    "coverage": {
+      "overall": {
+        "k": 9,
+        "n": 10,
+        "rate": 0.9,
+        "formatted": "9/10 (90.0%) [95% CI: 59.6% - 98.2%]"
+      },
+      "operational": {
+        "k": 4,
+        "n": 5,
+        "rate": 0.8,
+        "formatted": "4/5 (80.0%) [95% CI: 37.5% - 96.4%]"
+      },
+      "distractor": {
+        "k": 5,
+        "n": 5,
+        "rate": 1.0,
+        "formatted": "5/5 (100.0%) [95% CI: 56.5% - 100.0%]"
+      }
+    },
+    "selective_risk": {
+      "k": 5,
+      "n": 9,
+      "rate": 0.5556,
+      "formatted": "5/9 (55.6%) [95% CI: 26.7% - 81.1%]"
+    },
+    "selective_accuracy": {
+      "k": 4,
+      "n": 9,
+      "rate": 0.4444,
+      "formatted": "4/9 (44.4%) [95% CI: 18.9% - 73.3%]"
+    },
+    "false_positive_tool_execution": {
+      "k": 5,
+      "n": 5,
+      "rate": 1.0,
+      "formatted": "5/5 (100.0%) [95% CI: 56.5% - 100.0%]"
+    },
+    "clarification_failure": {
+      "k": 1,
+      "n": 1,
+      "rate": 1.0,
+      "formatted": "1/1 (100.0%) [95% CI: 20.6% - 100.0%]"
+    },
+    "missed_valid_requests": {
+      "k": 1,
+      "n": 5,
+      "rate": 0.2,
+      "formatted": "1/5 (20.0%) [95% CI: 3.6% - 62.5%]",
+      "breakdown_by_stage": {
+        "argument_validation_failure": 1
+      }
+    },
+    "task_success": {
+      "k": 4,
+      "n": 10,
+      "rate": 0.4,
+      "formatted": "4/10 (40.0%) [95% CI: 16.8% - 68.7%]"
+    },
+    "asr_metrics": {
+      "mean_wer": 0.0,
+      "mean_cer": 0.0
+    },
+    "failure_stage_counts": {
+      "intent_routing_failure": 4,
+      "argument_validation_failure": 1,
+      "clarification_failure": 1
+    }
+  },
+  "abstention_condition": {
+    "n_total": 10,
+    "n_operational": 5,
+    "n_distractor": 5,
+    "n_executed": 10,
+    "coverage": {
+      "overall": {
+        "k": 10,
+        "n": 10,
+        "rate": 1.0,
+        "formatted": "10/10 (100.0%) [95% CI: 72.2% - 100.0%]"
+      },
+      "operational": {
+        "k": 5,
+        "n": 5,
+        "rate": 1.0,
+        "formatted": "5/5 (100.0%) [95% CI: 56.5% - 100.0%]"
+      },
+      "distractor": {
+        "k": 5,
+        "n": 5,
+        "rate": 1.0,
+        "formatted": "5/5 (100.0%) [95% CI: 56.5% - 100.0%]"
+      }
+    },
+    "selective_risk": {
+      "k": 5,
+      "n": 10,
+      "rate": 0.5,
+      "formatted": "5/10 (50.0%) [95% CI: 23.7% - 76.3%]"
+    },
+    "selective_accuracy": {
+      "k": 5,
+      "n": 10,
+      "rate": 0.5,
+      "formatted": "5/10 (50.0%) [95% CI: 23.7% - 76.3%]"
+    },
+    "false_positive_tool_execution": {
+      "k": 5,
+      "n": 5,
+      "rate": 1.0,
+      "formatted": "5/5 (100.0%) [95% CI: 56.5% - 100.0%]"
+    },
+    "clarification_failure": {
+      "k": 1,
+      "n": 1,
+      "rate": 1.0,
+      "formatted": "1/1 (100.0%) [95% CI: 20.6% - 100.0%]"
+    },
+    "missed_valid_requests": {
+      "k": 0,
+      "n": 5,
+      "rate": 0.0,
+      "formatted": "0/5 (0.0%) [95% CI: 0.0% - 43.5%]",
+      "breakdown_by_stage": {}
+    },
+    "task_success": {
+      "k": 5,
+      "n": 10,
+      "rate": 0.5,
+      "formatted": "5/10 (50.0%) [95% CI: 23.7% - 76.3%]"
+    },
+    "asr_metrics": {
+      "mean_wer": 0.0,
+      "mean_cer": 0.0
+    },
+    "failure_stage_counts": {
+      "abstention_false_negative": 4,
+      "clarification_failure": 1
+    }
+  },
+  "sample_size": 10
+}

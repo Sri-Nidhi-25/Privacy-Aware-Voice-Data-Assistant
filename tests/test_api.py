@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_api.py - Integration and failure path tests for FastAPI endpoints.
 """
 from pathlib import Path
@@ -99,3 +99,66 @@ def test_api_temp_file_cleanup(client: TestClient, valid_wav_file: Path, monkeyp
     # All intermediate .input.wav files must be cleaned up in finally block
     current_input_files = set(temp_dir.glob("*.input.wav"))
     assert current_input_files == initial_files
+
+
+def test_stream_audio_unauthorized(client: TestClient):
+    res = client.get("/voice/audio/some_audio_id", headers={"api-key": "bad-key"})
+    assert res.status_code == 401
+
+
+def test_stream_audio_authorized_and_burn_after_reading(client: TestClient):
+    from app.voice.audio_store import audio_store
+
+    test_id = "test_burn_id"
+    test_content = b"WAV_OR_MP3_BINARY_DATA"
+    audio_store.store(test_id, test_content, media_type="audio/wav")
+
+    # 1. First authorized read via query parameter: should succeed with 200
+    res1 = client.get(f"/voice/audio/{test_id}?api_key={settings.API_KEY}")
+    assert res1.status_code == 200
+    assert res1.content == test_content
+    assert res1.headers["content-type"] == "audio/wav"
+
+    # Burn immediately for test assertion
+    audio_store.burn_immediately(test_id)
+
+    # 2. Subsequent read: should return 404 (burned from memory)
+    res2 = client.get(f"/voice/audio/{test_id}?api_key={settings.API_KEY}")
+    assert res2.status_code == 404
+
+
+def test_stream_audio_replay_multiple_times(client: TestClient):
+    """Verifies that users can replay audio multiple times while the session is active."""
+    from app.voice.audio_store import audio_store
+
+    replay_id = "test_replay_id"
+    replay_content = b"REPLAY_AUDIO_CONTENT"
+    audio_store.store(replay_id, replay_content, media_type="audio/mpeg")
+
+    # Multiple consecutive plays/replays must succeed
+    for _ in range(3):
+        res = client.get(f"/voice/audio/{replay_id}?api_key={settings.API_KEY}")
+        assert res.status_code == 200
+        assert res.content == replay_content
+
+
+def test_session_audio_cleanup_on_refresh_or_close(client: TestClient):
+    """Verifies that calling /voice/session/cleanup wipes all audio associated with a session."""
+    from app.voice.audio_store import audio_store
+
+    sess_id = "test_sess_999"
+    audio_store.store("sess_audio_1", b"AUDIO_1", media_type="audio/wav", session_id=sess_id)
+    audio_store.store("sess_audio_2", b"AUDIO_2", media_type="audio/mpeg", session_id=sess_id)
+
+    # Both audio files are accessible initially with matching session_id
+    assert client.get(f"/voice/audio/sess_audio_1?api_key={settings.API_KEY}&session_id={sess_id}").status_code == 200
+    assert client.get(f"/voice/audio/sess_audio_2?api_key={settings.API_KEY}&session_id={sess_id}").status_code == 200
+
+    # Frontend fires cleanup on page refresh / close
+    cleanup_res = client.post(f"/voice/session/cleanup?session_id={sess_id}&api_key={settings.API_KEY}")
+    assert cleanup_res.status_code == 200
+    assert cleanup_res.json()["cleaned_count"] >= 2
+
+    # Both files are now burned and return 404
+    assert client.get(f"/voice/audio/sess_audio_1?api_key={settings.API_KEY}&session_id={sess_id}").status_code == 404
+    assert client.get(f"/voice/audio/sess_audio_2?api_key={settings.API_KEY}&session_id={sess_id}").status_code == 404

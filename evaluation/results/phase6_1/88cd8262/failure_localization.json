@@ -1,0 +1,14 @@
+{
+  "baseline_failures": {
+    "intent_routing_failure": 5,
+    "clarification_failure": 1
+  },
+  "abstention_failures": {
+    "abstention_false_negative": 4,
+    "clarification_failure": 1
+  },
+  "baseline_missed_breakdown": {
+    "intent_routing_failure": 1
+  },
+  "abstention_missed_breakdown": {}
+}

@@ -1,0 +1,100 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Phase 6 Real Audio Collection Manifest Schema",
+  "description": "Standardized annotation schema for collecting and validating 100-150 real-audio cases for Privacy-Preserving Voice Data Assistant.",
+  "type": "object",
+  "required": [
+    "case_id",
+    "audio_path",
+    "audio_sha256",
+    "provenance",
+    "speaker_pseudonym",
+    "condition",
+    "reference_transcript",
+    "intended_semantic_meaning",
+    "expected_intent",
+    "is_operational",
+    "expected_decision",
+    "expected_safe_outcome",
+    "annotation_status"
+  ],
+  "properties": {
+    "case_id": {
+      "type": "string",
+      "pattern": "^(real_aud|bench_aud|collect_aud)_[a-zA-Z0-9_]+$",
+      "description": "Unique deterministic identifier for the audio evaluation case."
+    },
+    "audio_path": {
+      "type": "string",
+      "description": "Relative file path to the audio asset within the repository."
+    },
+    "audio_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "Cryptographic SHA256 checksum of raw audio file."
+    },
+    "provenance": {
+      "type": "string",
+      "enum": [
+        "authentic_human_recording",
+        "benchmark_phrase_recording",
+        "calibrated_multimodal_cache",
+        "consented_external_collection"
+      ],
+      "description": "Provenance of the audio asset. Synthetic speech MUST NOT be labeled as authentic human recording."
+    },
+    "speaker_pseudonym": {
+      "type": "string",
+      "description": "Pseudonymous identifier for the speaker to maintain confidentiality (e.g., human_speaker_01)."
+    },
+    "condition": {
+      "type": "string",
+      "enum": ["clean", "noisy_room", "mild", "medium", "strong", "10db", "20db", "reverberant", "clipped"],
+      "description": "Acoustic recording condition or perturbation applied."
+    },
+    "reference_transcript": {
+      "type": "string",
+      "description": "Exact verbatim ground-truth transcription of the speech."
+    },
+    "intended_semantic_meaning": {
+      "type": "string",
+      "description": "Human-verified description of the user's intended semantic goal."
+    },
+    "expected_intent": {
+      "type": "string",
+      "enum": ["crm", "support", "analytics", "direct", "clarify", "abstain"],
+      "description": "Target domain intent."
+    },
+    "is_operational": {
+      "type": "boolean",
+      "description": "True if the request explicitly asks for actionable database tool execution; False for conversational, out-of-domain, or semantic distractors."
+    },
+    "expected_tool": {
+      "type": ["string", "null"],
+      "enum": ["get_crm_data", "get_support_tickets", "get_analytics", null],
+      "description": "Expected database connector tool to be executed, or null if no tool should be called."
+    },
+    "expected_args": {
+      "type": "object",
+      "description": "Expected parameter dictionary required for safe tool execution."
+    },
+    "expected_decision": {
+      "type": "string",
+      "enum": ["EXECUTE", "ABSTAIN", "CLARIFY"],
+      "description": "Safe expected decision under the Phase 5 abstention router."
+    },
+    "expected_safe_outcome": {
+      "type": "string",
+      "description": "Expected end-to-end safe outcome."
+    },
+    "annotation_status": {
+      "type": "string",
+      "enum": ["verified", "pending_review", "ambiguous", "rejected"],
+      "description": "Human verification state."
+    },
+    "ambiguity_notes": {
+      "type": ["string", "null"],
+      "description": "Notes explaining linguistic ambiguity, boundary condition, or distractor mechanism."
+    }
+  }
+}

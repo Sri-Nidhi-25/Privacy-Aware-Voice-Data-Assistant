@@ -1,0 +1,9 @@
+# Development, evaluation, and benchmark dependencies
+-r requirements.txt
+
+# Neural speaker verification benchmark (eval_speaker_similarity.py)
+transformers
+torchaudio
+
+# Word Error Rate benchmark evaluation (benchmark_obfuscation.py)
+jiwer

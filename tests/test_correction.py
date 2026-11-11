@@ -1,4 +1,4 @@
-﻿"""
+"""
 tests/test_correction.py - Tests for transcript post-correction and safety guardrails.
 """
 from unittest.mock import MagicMock

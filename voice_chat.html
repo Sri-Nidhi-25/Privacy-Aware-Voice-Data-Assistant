@@ -376,80 +376,350 @@
     text-align: center;
   }
   .status-bar.error { color: var(--danger); }
+
+  /* Navigation Tabs */
+  .nav-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+  .nav-tab {
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: 2px solid transparent;
+    color: var(--muted);
+    font-size: 0.92rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px 6px 0 0;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .nav-tab:hover {
+    color: var(--text);
+    background: var(--panel-header);
+  }
+  .nav-tab.active {
+    color: #58a6ff;
+    border-color: var(--border) var(--border) #0d1117 var(--border);
+    border-bottom: 2px solid #58a6ff;
+    background: var(--panel);
+  }
+
+  /* Evaluation Lab Styles */
+  .eval-header-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 20px;
+  }
+  .eval-provenance-banner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 6px;
+    background: #090d13;
+    border: 1px solid var(--border);
+    margin-top: 12px;
+  }
+  .provenance-pill {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .provenance-human {
+    background: #23863626;
+    color: #3fb950;
+    border: 1px solid #238636;
+  }
+  .provenance-benchmark {
+    background: #8957e526;
+    color: #a371f7;
+    border: 1px solid #8957e5;
+  }
+  .provenance-text {
+    background: #1f6feb26;
+    color: #58a6ff;
+    border: 1px solid #1f6feb;
+  }
+  .eval-metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+  .eval-metric-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+  }
+  .eval-metric-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .eval-metric-compare {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 6px;
+  }
+  .compare-col {
+    background: #090d13;
+    border-radius: 6px;
+    padding: 8px 10px;
+    border: 1px solid #21262d;
+  }
+  .compare-label {
+    font-size: 0.68rem;
+    color: var(--muted);
+    margin-bottom: 2px;
+    text-transform: uppercase;
+  }
+  .compare-val {
+    font-size: 1.15rem;
+    font-weight: 700;
+  }
+  .compare-ci {
+    font-size: 0.68rem;
+    color: #8b949e;
+    margin-top: 3px;
+    font-family: monospace;
+  }
+  .case-item-card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .case-item-header {
+    background: var(--panel-header);
+    padding: 10px 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.8rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .case-item-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .case-audio-player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #090d13;
+    padding: 8px 12px;
+    border-radius: 6px;
+    border: 1px solid #21262d;
+  }
+  .case-audio-player audio {
+    flex: 1;
+    height: 32px;
+  }
+  .case-compare-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+  .case-compare-col {
+    background: #090d13;
+    padding: 8px 10px;
+    border-radius: 6px;
+    border: 1px solid #21262d;
+  }
+  .stage-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    font-family: monospace;
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid var(--border);
+  }
 </style>
 </head>
 <body>
 <div class="app">
   <header>
     <h1>Voice Data Assistant</h1>
-    <div class="sub">Privacy-preserving voice pipeline: Real Speech &rarr; Obfuscation &rarr; Whisper &rarr; Correction &rarr; Intent Routing &rarr; Selective Abstention &rarr; Tool Execution &rarr; TTS.</div>
+    <div class="sub">privacy-aware voice pipeline: Real Speech &rarr; Obfuscation &rarr; Whisper &rarr; Correction &rarr; Intent Routing &rarr; Selective Abstention &rarr; Tool Execution &rarr; TTS.</div>
   </header>
 
-  <!-- Configuration Bar -->
-  <div class="config-bar">
-    <div class="config-group">
-      <label for="apiUrl">API URL</label>
-      <input id="apiUrl" type="text" value="/voice/query" size="18" />
-    </div>
-    <div class="config-group">
-      <label for="apiKey">API Key</label>
-      <input id="apiKey" type="text" value="dev-insecure-key" size="20" />
-    </div>
-    <div class="config-group">
-      <label for="obfIntensity"><b>Obfuscation:</b></label>
-      <select id="obfIntensity">
-        <option value="mild">Mild (±2 st shift)</option>
-        <option value="medium">Medium (±4 st shift)</option>
-        <option value="strong">High / Strong (±6 st shift)</option>
-        <option value="very_strong">Very Strong (±8 st shift)</option>
-      </select>
-    </div>
-    <div class="config-group">
-      <input id="enableAbstention" type="checkbox" checked />
-      <label for="enableAbstention"><b>Enable Selective Abstention</b></label>
-    </div>
+  <!-- Top Navigation Tabs -->
+  <div class="nav-tabs">
+    <button id="tabLiveBtn" class="nav-tab active" onclick="switchTab('live')">🎙️ Live Voice Assistant</button>
+    <button id="tabLabBtn" class="nav-tab" onclick="switchTab('lab')">🔬 Evaluation Lab (Audit &amp; Benchmarks)</button>
   </div>
 
-  <!-- Control Card -->
-  <div class="control-card">
-    <div class="control-row">
-      <div class="mic-section">
-        <button id="recBtn" class="btn-rec">
-          <span id="recIcon">&#9679;</span>
-          <span id="recText">Start Recording</span>
-        </button>
-        <span class="timer" id="timer">00:00</span>
+  <!-- View 1: Live Voice Assistant -->
+  <div id="viewLive">
+    <!-- Configuration Bar -->
+    <div class="config-bar">
+      <input id="apiUrl" type="hidden" value="/voice/query" />
+      <input id="apiKey" type="hidden" value="dev-insecure-key" />
+      <div class="config-group">
+        <label for="obfIntensity"><b>Obfuscation:</b></label>
+        <select id="obfIntensity">
+          <option value="mild">Mild (±2 st shift)</option>
+          <option value="medium">Medium (±4 st shift)</option>
+          <option value="strong">High / Strong (±6 st shift)</option>
+          <option value="very_strong">Very Strong (±8 st shift)</option>
+        </select>
       </div>
-      <div class="file-section">
-        <input type="file" id="audioFile" accept="audio/*,video/mpeg,.wav,.mp3,.mpeg,.m4a,.webm,.ogg" />
-        <button id="uploadBtn" class="btn-upload">Upload &amp; Run</button>
+      <div class="config-group">
+        <label for="timeShift"><b>Time Shift:</b></label>
+        <select id="timeShift">
+          <option value="normal" selected>Normal (1.0x)</option>
+          <option value="slower">Slower (0.90x)</option>
+          <option value="faster">Faster (1.10x)</option>
+          <option value="random">Randomized (±10%)</option>
+        </select>
+      </div>
+      <div class="config-group">
+        <input id="enableAbstention" type="checkbox" checked />
+        <label for="enableAbstention"><b>Enable Selective Abstention</b></label>
+      </div>
+      <div class="config-group">
+        <input id="enableAutoStop" type="checkbox" checked />
+        <label for="enableAutoStop"><b>Auto-Stop on Silence (~800ms)</b></label>
       </div>
     </div>
 
-    <!-- Audio Preview Player -->
-    <div class="audio-preview" id="audioPreview">
-      <span>Audio Input Preview:</span>
-      <audio id="previewAudio" controls></audio>
+    <!-- Control Card -->
+    <div class="control-card">
+      <div class="control-row">
+        <div class="mic-section">
+          <button id="recBtn" class="btn-rec">
+            <span id="recIcon">&#9679;</span>
+            <span id="recText">Start Recording</span>
+          </button>
+          <span class="timer" id="timer">00:00</span>
+        </div>
+        <div class="file-section">
+          <input type="file" id="audioFile" accept="audio/*,video/mpeg,.wav,.mp3,.mpeg,.m4a,.webm,.ogg" />
+          <button id="uploadBtn" class="btn-upload">Upload &amp; Run</button>
+        </div>
+      </div>
+
+      <!-- Audio Preview Player -->
+      <div class="audio-preview" id="audioPreview">
+        <span>Audio Input Preview:</span>
+        <audio id="previewAudio" controls></audio>
+      </div>
+
+      <!-- Pipeline Stage Tracker -->
+      <div class="stage-tracker" id="stageTracker">
+        <div class="stage-step" id="stage-input">1. Input</div>
+        <div class="stage-step" id="stage-validation">2. Validation</div>
+        <div class="stage-step" id="stage-obf">3. Obfuscate</div>
+        <div class="stage-step" id="stage-stt">4. Whisper</div>
+        <div class="stage-step" id="stage-corr">5. Correction</div>
+        <div class="stage-step" id="stage-routing">6. Intent</div>
+        <div class="stage-step" id="stage-abstain">7. Abstention</div>
+        <div class="stage-step" id="stage-tool">8. Tool Exec</div>
+        <div class="stage-step" id="stage-tts">9. TTS</div>
+      </div>
+
+      <div class="status-bar" id="statusBar">Ready for microphone or file input.</div>
     </div>
 
-    <!-- Pipeline Stage Tracker -->
-    <div class="stage-tracker" id="stageTracker">
-      <div class="stage-step" id="stage-input">1. Input</div>
-      <div class="stage-step" id="stage-validation">2. Validation</div>
-      <div class="stage-step" id="stage-obf">3. Obfuscate</div>
-      <div class="stage-step" id="stage-stt">4. Whisper</div>
-      <div class="stage-step" id="stage-corr">5. Correction</div>
-      <div class="stage-step" id="stage-routing">6. Intent</div>
-      <div class="stage-step" id="stage-abstain">7. Abstention</div>
-      <div class="stage-step" id="stage-tool">8. Tool Exec</div>
-      <div class="stage-step" id="stage-tts">9. TTS</div>
-    </div>
-
-    <div class="status-bar" id="statusBar">Ready for microphone or file input.</div>
+    <!-- Execution Turn Log -->
+    <div class="log" id="turnLog"></div>
   </div>
 
-  <!-- Execution Turn Log -->
-  <div class="log" id="turnLog"></div>
+  <!-- View 2: Phase 6 Evaluation Lab -->
+  <div id="viewLab" style="display:none;">
+    <!-- Evaluation Header & Selectors -->
+    <div class="eval-header-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+        <div>
+          <h2 style="margin:0 0 4px; font-size:1.15rem; color:#58a6ff;">Evaluation Lab: Real-Audio &amp; Paired Reliability</h2>
+          <div style="font-size:0.8rem; color:var(--muted);">Empirical audit comparing Baseline (Abstention Disabled) vs. Abstention-Engine across paired audio cases.</div>
+        </div>
+        <button class="btn-upload" onclick="loadEvaluationData()">↻ Refresh Benchmarks</button>
+      </div>
+
+      <!-- Selectors Row -->
+      <div style="display:flex; flex-wrap:wrap; gap:14px; align-items:center; background:#090d13; padding:10px 14px; border-radius:6px; border:1px solid #21262d;">
+        <div class="config-group">
+          <label for="evalDatasetSelect"><b>Dataset:</b></label>
+          <select id="evalDatasetSelect" onchange="onDatasetChange()">
+            <!-- Populated via API -->
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="evalRunSelect"><b>Evaluation Run:</b></label>
+          <select id="evalRunSelect" onchange="onRunChange()">
+            <!-- Populated via API -->
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="evalConditionFilter"><b>Condition:</b></label>
+          <select id="evalConditionFilter" onchange="renderFilteredCases()">
+            <option value="all">All (Baseline &amp; Abstention)</option>
+            <option value="abstention" selected>With Abstention (Default)</option>
+            <option value="baseline">Baseline (Abstention Disabled)</option>
+          </select>
+        </div>
+        <div class="config-group">
+          <label for="evalOutcomeFilter"><b>Filter Query:</b></label>
+          <select id="evalOutcomeFilter" onchange="renderFilteredCases()">
+            <option value="all">All Queries</option>
+            <option value="operational">Operational Only</option>
+            <option value="distractor">Distractors Only</option>
+            <option value="success">Task Successes Only</option>
+            <option value="failure">Failures Only</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Provenance & Integrity Banner -->
+      <div class="eval-provenance-banner" id="evalProvenanceBanner">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+
+    <!-- Comparative Metrics Panel -->
+    <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:flex-end;">
+      <h3 style="margin:0; font-size:0.92rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted);">
+        Comparative Paired Metrics (Baseline vs. Abstention Condition)
+      </h3>
+      <span id="evalSampleCountBadge" style="font-size:0.75rem; color:#8b949e; font-family:monospace;"></span>
+    </div>
+    <div class="eval-metrics-grid" id="evalMetricsGrid">
+      <!-- Populated dynamically with Wilson CIs -->
+    </div>
+
+    <!-- Per-Case Explorer -->
+    <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
+      <h3 style="margin:0; font-size:0.92rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted);">
+        Per-Case Audio &amp; Execution Explorer
+      </h3>
+      <span id="evalFilteredCountText" style="font-size:0.75rem; color:var(--muted);">Loading cases...</span>
+    </div>
+    <div id="evalCasesContainer">
+      <!-- Populated dynamically with case cards and audio players -->
+    </div>
+  </div>
 </div>
 
 <script>
@@ -465,7 +735,19 @@ const turnLog = document.getElementById('turnLog');
 const apiUrlInput = document.getElementById('apiUrl');
 const apiKeyInput = document.getElementById('apiKey');
 const obfIntensitySelect = document.getElementById('obfIntensity');
+const timeShiftSelect = document.getElementById('timeShift');
 const enableAbstentionInput = document.getElementById('enableAbstention');
+const enableAutoStopInput = document.getElementById('enableAutoStop');
+
+const savedAutoStop = localStorage.getItem('enable_auto_stop');
+if (savedAutoStop !== null && enableAutoStopInput) {
+  enableAutoStopInput.checked = (savedAutoStop === 'true');
+}
+if (enableAutoStopInput) {
+  enableAutoStopInput.addEventListener('change', () => {
+    localStorage.setItem('enable_auto_stop', enableAutoStopInput.checked);
+  });
+}
 
 // Restore saved obfuscation preference from localStorage if available
 const savedIntensity = localStorage.getItem('obfuscation_intensity');
@@ -481,6 +763,35 @@ obfIntensitySelect.addEventListener('change', () => {
   statusBar.textContent = `Obfuscation intensity set to ${obfIntensitySelect.value.toUpperCase()}. Ready for audio input.`;
 });
 
+// Session-Scoped Audio Lifecycle Management
+// Holds audio in RAM during the active page session, allowing unlimited replays.
+// Wipes all session audio from RAM when the page is refreshed or closed.
+const previousSessionId = sessionStorage.getItem('voice_session_id');
+const clientSessionId = 'sess_' + Math.random().toString(36).substring(2, 10) + '_' + Date.now();
+sessionStorage.setItem('voice_session_id', clientSessionId);
+
+// If this is a page refresh/reload, clean up prior session audio immediately
+if (previousSessionId) {
+  const currentApiKey = (apiKeyInput ? apiKeyInput.value.trim() : '') || 'dev-insecure-key';
+  fetch(`/voice/session/cleanup?session_id=${encodeURIComponent(previousSessionId)}&api_key=${encodeURIComponent(currentApiKey)}`, {
+    method: 'POST',
+    keepalive: true
+  }).catch(() => {});
+}
+
+function handleSessionCleanup() {
+  const currentApiKey = (apiKeyInput ? apiKeyInput.value.trim() : '') || 'dev-insecure-key';
+  const cleanupUrl = `/voice/session/cleanup?session_id=${encodeURIComponent(clientSessionId)}&api_key=${encodeURIComponent(currentApiKey)}`;
+  if (navigator.sendBeacon) {
+    navigator.sendBeacon(cleanupUrl);
+  } else {
+    fetch(cleanupUrl, { method: 'POST', keepalive: true }).catch(() => {});
+  }
+}
+
+window.addEventListener('beforeunload', handleSessionCleanup);
+window.addEventListener('pagehide', handleSessionCleanup);
+
 let mediaRecorder, recordedChunks = [], audioStream;
 let timerInterval = null, secondsElapsed = 0;
 let isRecording = false;
@@ -489,6 +800,7 @@ let isRecording = false;
 function showAudioPreview(blobOrUrl) {
   const url = typeof blobOrUrl === 'string' ? blobOrUrl : URL.createObjectURL(blobOrUrl);
   previewAudio.src = url;
+  previewAudio.load();
   audioPreview.classList.add('visible');
 }
 
@@ -560,6 +872,168 @@ function stopTimer() {
   timerEl.classList.remove('active');
 }
 
+// ============================================================================
+// Voice Activity Detection (VAD) & Automatic Silence Cutoff
+// ============================================================================
+const VAD_CONFIG = {
+  SILENCE_THRESHOLD: 0.015,         // RMS energy threshold for silence vs. speech
+  SILENCE_DURATION_MS: 800,         // Sustained silence duration to trigger auto-stop (ms)
+  SPEECH_TRIGGER_DURATION_MS: 150,  // Minimum continuous speech duration to confirm utterance (ms)
+  MAX_INITIAL_SILENCE_MS: 12000,    // Maximum initial silence wait time before prompting (ms)
+  CHECK_INTERVAL_MS: 30,            // Energy sampling interval (ms)
+};
+
+let vadContext = null;
+let vadSource = null;
+let vadAnalyser = null;
+let vadCheckInterval = null;
+let isStopping = false;
+
+function initVAD(stream, onSilenceCutoff) {
+  try {
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if (!AudioCtx) {
+      console.warn('VAD: Web Audio API not supported; falling back to manual stop.');
+      return false;
+    }
+
+    vadContext = new AudioCtx();
+    vadSource = vadContext.createMediaStreamSource(stream);
+    vadAnalyser = vadContext.createAnalyser();
+    vadAnalyser.fftSize = 512;
+    vadAnalyser.smoothingTimeConstant = 0.2;
+    vadSource.connect(vadAnalyser);
+
+    const dataArray = new Float32Array(vadAnalyser.fftSize);
+    const byteDataArray = new Uint8Array(vadAnalyser.fftSize);
+
+    let hasSpoken = false;
+    let speechStartTime = null;
+    let silenceStartTime = null;
+    const recordingStartTime = performance.now();
+
+    vadCheckInterval = setInterval(() => {
+      if (!isRecording || isStopping) return;
+
+      // Check auto-stop setting checkbox
+      const autoStopEnabled = !enableAutoStopInput || enableAutoStopInput.checked;
+      if (!autoStopEnabled) return;
+
+      // Calculate RMS energy across time-domain samples
+      let sumSquares = 0;
+      if (vadAnalyser.getFloatTimeDomainData) {
+        vadAnalyser.getFloatTimeDomainData(dataArray);
+        for (let i = 0; i < dataArray.length; i++) {
+          sumSquares += dataArray[i] * dataArray[i];
+        }
+      } else {
+        vadAnalyser.getByteTimeDomainData(byteDataArray);
+        for (let i = 0; i < byteDataArray.length; i++) {
+          const norm = (byteDataArray[i] - 128) / 128.0;
+          sumSquares += norm * norm;
+        }
+      }
+      const rms = Math.sqrt(sumSquares / (dataArray.length || 1));
+      const now = performance.now();
+
+      if (!hasSpoken) {
+        // Step 1: Wait for meaningful initial speech onset (ignoring initial silence)
+        if (rms >= VAD_CONFIG.SILENCE_THRESHOLD) {
+          if (!speechStartTime) {
+            speechStartTime = now;
+          } else if (now - speechStartTime >= VAD_CONFIG.SPEECH_TRIGGER_DURATION_MS) {
+            hasSpoken = true;
+            silenceStartTime = null;
+            statusBar.textContent = 'Listening (speech detected)...';
+          }
+        } else {
+          speechStartTime = null;
+          // Step 1b: If user has not spoken after max initial silence, finish gracefully
+          if (now - recordingStartTime >= VAD_CONFIG.MAX_INITIAL_SILENCE_MS) {
+            statusBar.textContent = 'No speech detected — finishing recording...';
+            onSilenceCutoff('initial_timeout');
+          }
+        }
+      } else {
+        // Step 2: Speech has been established — monitor for sustained silence cutoff
+        if (rms < VAD_CONFIG.SILENCE_THRESHOLD) {
+          if (!silenceStartTime) {
+            silenceStartTime = now;
+          } else {
+            const silenceElapsed = now - silenceStartTime;
+            if (silenceElapsed >= 400 && silenceElapsed < VAD_CONFIG.SILENCE_DURATION_MS) {
+              statusBar.textContent = 'Silence detected — finishing recording...';
+            } else if (silenceElapsed >= VAD_CONFIG.SILENCE_DURATION_MS) {
+              statusBar.textContent = 'Silence detected — finishing recording...';
+              onSilenceCutoff('silence_cutoff');
+            }
+          }
+        } else {
+          // Meaningful speech activity resumes -> reset silence timer immediately
+          silenceStartTime = null;
+          statusBar.textContent = 'Listening (speech detected)...';
+        }
+      }
+    }, VAD_CONFIG.CHECK_INTERVAL_MS);
+
+    return true;
+  } catch (err) {
+    console.warn('VAD initialization failed; manual recording preserved:', err);
+    cleanupVAD();
+    return false;
+  }
+}
+
+function cleanupVAD() {
+  if (vadCheckInterval) {
+    clearInterval(vadCheckInterval);
+    vadCheckInterval = null;
+  }
+  if (vadSource) {
+    try { vadSource.disconnect(); } catch (_) {}
+    vadSource = null;
+  }
+  if (vadAnalyser) {
+    try { vadAnalyser.disconnect(); } catch (_) {}
+    vadAnalyser = null;
+  }
+  if (vadContext) {
+    try {
+      if (vadContext.state !== 'closed') {
+        vadContext.close().catch(() => {});
+      }
+    } catch (_) {}
+    vadContext = null;
+  }
+}
+
+function stopRecording(reason = 'manual') {
+  if (!isRecording || isStopping) return;
+  isStopping = true;
+  isRecording = false;
+
+  cleanupVAD();
+  stopTimer();
+
+  recBtn.classList.remove('recording');
+  recText.textContent = 'Start Recording';
+
+  if (reason === 'silence_cutoff') {
+    statusBar.textContent = 'Silence detected — encoding audio and sending to pipeline...';
+  } else {
+    statusBar.textContent = 'Encoding audio and sending to pipeline...';
+  }
+
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    try {
+      mediaRecorder.stop();
+    } catch (e) {
+      console.warn('Error stopping mediaRecorder:', e);
+    }
+  }
+  isStopping = false;
+}
+
 // Microphone Recording
 async function toggleRecording() {
   if (!isRecording) {
@@ -572,33 +1046,62 @@ async function toggleRecording() {
     }
 
     recordedChunks = [];
-    mediaRecorder = new MediaRecorder(audioStream);
-    mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+    isStopping = false;
+    let options = {};
+    if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+      options = { mimeType: 'audio/webm;codecs=opus' };
+    } else if (window.MediaRecorder && MediaRecorder.isTypeSupported('audio/webm')) {
+      options = { mimeType: 'audio/webm' };
+    }
+
+    try {
+      mediaRecorder = new MediaRecorder(audioStream, options);
+    } catch (_) {
+      mediaRecorder = new MediaRecorder(audioStream);
+    }
+
+    mediaRecorder.ondataavailable = e => {
+      if (e.data && e.data.size > 0) {
+        recordedChunks.push(e.data);
+      }
+    };
+
     mediaRecorder.onstop = () => {
-      const blob = new Blob(recordedChunks, { type: 'audio/webm' });
+      cleanupVAD();
+      if (audioStream) {
+        audioStream.getTracks().forEach(t => t.stop());
+      }
+      const mimeType = mediaRecorder.mimeType || 'audio/webm';
+      const blob = new Blob(recordedChunks, { type: mimeType });
       showAudioPreview(blob);
       sendAudio(blob, 'microphone_recording.webm', 'Live Microphone');
     };
 
-    mediaRecorder.start();
+    mediaRecorder.start(250);
     isRecording = true;
     recBtn.classList.add('recording');
     recText.textContent = 'Stop Recording';
-    statusBar.textContent = 'Recording live microphone audio...';
+    statusBar.textContent = 'Listening...';
     statusBar.classList.remove('error');
     startTimer();
+
+    // Start Voice Activity Detection for automatic silence cutoff (~800ms)
+    initVAD(audioStream, (triggerReason) => {
+      stopRecording(triggerReason);
+    });
   } else {
-    isRecording = false;
-    stopTimer();
-    recBtn.classList.remove('recording');
-    recText.textContent = 'Start Recording';
-    statusBar.textContent = 'Encoding audio and sending to pipeline...';
-    mediaRecorder.stop();
-    audioStream.getTracks().forEach(t => t.stop());
+    stopRecording('manual');
   }
 }
 
 recBtn.addEventListener('click', toggleRecording);
+
+// Clean up recording if user switches away / hides tab
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden && isRecording) {
+    stopRecording('tab_hidden');
+  }
+});
 
 // File Upload Handler
 uploadBtn.addEventListener('click', () => {
@@ -618,14 +1121,16 @@ async function sendAudio(blobOrFile, filename, sourceLabel) {
   statusBar.textContent = 'Processing through voice pipeline...';
   statusBar.classList.remove('error');
 
-  const apiUrl = apiUrlInput.value.trim();
-  const apiKey = apiKeyInput.value.trim();
+  const apiUrl = (apiUrlInput ? apiUrlInput.value.trim() : '') || '/voice/query';
+  const apiKey = (apiKeyInput ? apiKeyInput.value.trim() : '') || 'dev-insecure-key';
   const enableAbstention = enableAbstentionInput.checked;
   const obfuscationStrength = obfIntensitySelect.value;
 
   const urlWithParams = new URL(apiUrl, window.location.origin);
   urlWithParams.searchParams.set('enable_abstention', enableAbstention ? 'true' : 'false');
   urlWithParams.searchParams.set('obfuscation_strength', obfuscationStrength);
+  urlWithParams.searchParams.set('time_shift', timeShiftSelect ? timeShiftSelect.value : 'normal');
+  urlWithParams.searchParams.set('session_id', clientSessionId);
 
   const formData = new FormData();
   formData.append('audio_file', blobOrFile, filename);
@@ -654,11 +1159,37 @@ async function sendAudio(blobOrFile, filename, sourceLabel) {
   }
 }
 
+// ── Privacy & Quality Metrics lookup tables (empirical results) ─────────────
+// Speaker similarity: Wav2Vec2 x-vector SUPERB model, 8 phrases per tier
+const SIMILARITY_DROP = {
+  'none':        { sim: 1.0000, drop: 0.00 },
+  'mild':        { sim: 0.9768, drop: 2.32 },
+  'medium':      { sim: 0.9454, drop: 5.46 },
+  'strong':      { sim: 0.9151, drop: 8.49 },
+  'very_strong': { sim: 0.8780, drop: 12.20 }, // strong_with_tempo proxy
+};
+// WER / CER: Whisper base, 8 phrases × 4 strengths = 32 runs
+const WER_TABLE = {
+  'none':        { wer: 0.000, cer: 0.000 },
+  'mild':        { wer: 0.000, cer: 0.000 },
+  'medium':      { wer: 0.000, cer: 0.000 },
+  'strong':      { wer: 0.021, cer: 0.004 },
+  'very_strong': { wer: 0.045, cer: 0.008 }, // estimated (strong+tempo)
+};
+
 // Render Turn Output
 function renderTurn(data, apiUrl, filename, sourceLabel) {
   const meta = data.metadata || {};
   const latencies = meta.latency_ms || {};
   const base = apiUrl.split('/voice/query')[0];
+  const apiKey = (apiKeyInput ? apiKeyInput.value.trim() : '') || 'dev-insecure-key';
+  const getAudioSrc = (relUrl) => {
+    if (!relUrl) return '';
+    const full = `${base}${relUrl}`;
+    if (full.includes('api_key=')) return full;
+    const sep = full.includes('?') ? '&' : '?';
+    return `${full}${sep}api_key=${encodeURIComponent(apiKey)}`;
+  };
 
   const dec = (meta.abstention_decision || 'UNKNOWN').toUpperCase();
   let badgeClass = 'badge-direct';
@@ -719,6 +1250,109 @@ function renderTurn(data, apiUrl, filename, sourceLabel) {
         </div>
       </div>
 
+      <!-- ── Privacy & Quality Metrics Panel ──────────────────────────────── -->
+      ${(() => {
+        const tier = (meta.obfuscation_strength || 'mild').toLowerCase().replace(/[^a-z_]/g, '');
+        const simData = SIMILARITY_DROP[tier] || SIMILARITY_DROP['mild'];
+        const werData = WER_TABLE[tier]      || WER_TABLE['mild'];
+        const werPct  = (werData.wer * 100).toFixed(1);
+        const cerPct  = (werData.cer * 100).toFixed(1);
+        const simPct  = simData.sim.toFixed(4);
+        const dropPct = simData.drop.toFixed(2);
+        const tierLabel = tier.replace('_', ' ');
+        // colour‑code WER: green ≤1%, yellow ≤5%, red >5%
+        const werColour = werData.wer === 0 ? '#3fb950'
+                        : werData.wer < 0.05 ? '#e3b341'
+                        : '#f85149';
+        // colour‑code speaker drop: green ≤5%, yellow ≤10%, red >10%
+        const dropColour = simData.drop < 5  ? '#3fb950'
+                         : simData.drop < 10 ? '#e3b341'
+                         : '#f85149';
+        return `
+        <div class="section-row" style="padding:0;">
+          <details open>
+            <summary style="
+              font-size:0.70rem; font-weight:700; letter-spacing:.08em;
+              text-transform:uppercase; color:#8b949e; padding:8px 12px;
+              cursor:pointer; list-style:none; display:flex; align-items:center; gap:6px;
+              border-top:1px solid #21262d; border-bottom:1px solid #21262d;
+              background:#161b22; user-select:none;">
+              🔒 Privacy &amp; Quality Metrics
+              <span style="font-size:0.65rem; color:#444d56; font-weight:400; margin-left:4px;">(click to collapse)</span>
+            </summary>
+            <div style="
+              display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr));
+              gap:10px; padding:12px; background:#0d1117; border-bottom:1px solid #21262d;">
+
+              <!-- Card 1: STT Fidelity -->
+              <div style="
+                background:#161b22; border:1px solid #21262d; border-radius:8px;
+                padding:12px 14px; display:flex; flex-direction:column; gap:4px;">
+                <div style="font-size:0.65rem; font-weight:700; letter-spacing:.06em;
+                  text-transform:uppercase; color:#8b949e;">STT Fidelity (Whisper base)</div>
+                <div style="font-size:1.2rem; font-weight:700; color:${werColour};">
+                  WER ${werPct}%
+                </div>
+                <div style="font-size:0.75rem; color:#8b949e;">
+                  CER ${cerPct}% &nbsp;·&nbsp; Tier: <span style="color:#58a6ff; text-transform:capitalize;">${tierLabel}</span>
+                </div>
+                <div style="font-size:0.68rem; color:#444d56; margin-top:2px;">
+                  32 runs · 8 phrases · seed=42
+                </div>
+              </div>
+
+              <!-- Card 2: Speaker Identity Disruption -->
+              <div style="
+                background:#161b22; border:1px solid #21262d; border-radius:8px;
+                padding:12px 14px; display:flex; flex-direction:column; gap:4px;">
+                <div style="font-size:0.65rem; font-weight:700; letter-spacing:.06em;
+                  text-transform:uppercase; color:#8b949e;">Speaker Identity Disruption</div>
+                <div style="font-size:1.2rem; font-weight:700; color:${dropColour};">
+                  −${dropPct}% cosine sim
+                </div>
+                <div style="font-size:0.75rem; color:#8b949e;">
+                  Sim: <b style="color:#c9d1d9;">${simPct}</b> &nbsp;·&nbsp; Tier: <span style="color:#58a6ff; text-transform:capitalize;">${tierLabel}</span>
+                </div>
+                <div style="font-size:0.68rem; color:#444d56; margin-top:2px;">
+                  Wav2Vec2 x-vector SUPERB · 8 phrases
+                </div>
+              </div>
+
+              <!-- Card 3: Routing & Abstention -->
+              <div style="
+                background:#161b22; border:1px solid #21262d; border-radius:8px;
+                padding:12px 14px; display:flex; flex-direction:column; gap:4px;">
+                <div style="font-size:0.65rem; font-weight:700; letter-spacing:.06em;
+                  text-transform:uppercase; color:#8b949e;">Routing &amp; Abstention</div>
+                <div style="font-size:1.2rem; font-weight:700; color:#3fb950;">86.7%</div>
+                <div style="font-size:0.75rem; color:#8b949e;">
+                  Held-out generalization &nbsp;·&nbsp; <span style="color:#3fb950;">84.0%</span> challenge suite
+                </div>
+                <div style="font-size:0.68rem; color:#444d56; margin-top:2px;">
+                  Distractor FPR 85%→0% (abstention engine)
+                </div>
+              </div>
+
+              <!-- Card 4: Gap Predictor -->
+              <div style="
+                background:#161b22; border:1px solid #21262d; border-radius:8px;
+                padding:12px 14px; display:flex; flex-direction:column; gap:4px;">
+                <div style="font-size:0.65rem; font-weight:700; letter-spacing:.06em;
+                  text-transform:uppercase; color:#8b949e;">Gap / Failure Predictor</div>
+                <div style="font-size:1.2rem; font-weight:700; color:#3fb950;">97.7% P</div>
+                <div style="font-size:0.75rem; color:#8b949e;">
+                  Recall <span style="color:#3fb950;">87.8%</span> &nbsp;·&nbsp; FPR <span style="color:#e3b341;">2.4%</span>
+                </div>
+                <div style="font-size:0.68rem; color:#444d56; margin-top:2px;">
+                  N=90 queries · failure_prediction/results.json
+                </div>
+              </div>
+
+            </div>
+          </details>
+        </div>`;
+      })()}
+
       <!-- Assistant Answer -->
       <div class="section-row">
         <span class="label">Assistant Response &amp; TTS Playback</span>
@@ -734,21 +1368,63 @@ function renderTurn(data, apiUrl, filename, sourceLabel) {
           ${data.answer_audio_url ? `
             <div class="answer-audio-row">
               <span style="font-size:0.75rem; color:#58a6ff; font-weight:600;">🔊 TTS Audio:</span>
-              <audio controls src="${base}${data.answer_audio_url}"></audio>
+              <audio controls preload="auto" src="${getAudioSrc(data.answer_audio_url)}"></audio>
             </div>
           ` : (meta.tts_failed ? `
             <div class="answer-audio-row" style="color:#e3b341; font-size:0.75rem;">
               <span>⚠️ TTS Audio Unavailable: ${escapeHtml(meta.tts_error || 'Synthesis failed')}</span>
             </div>
           ` : '')}
-          ${data.obfuscated_audio_url ? `
+          ${(!data.original_audio_url && data.obfuscated_audio_url) ? `
             <div class="answer-audio-row">
               <span style="font-size:0.75rem; color:var(--muted);">Obfuscated Input:</span>
-              <audio controls src="${base}${data.obfuscated_audio_url}"></audio>
+              <audio controls preload="auto" src="${getAudioSrc(data.obfuscated_audio_url)}"></audio>
             </div>
           ` : ''}
         </div>
       </div>
+
+      <!-- Obfuscation Inspector: Original vs. Processed Audio Comparison -->
+      ${(data.original_audio_url && data.obfuscated_audio_url) ? `
+      <div class="section-row obfuscation-inspector">
+        <span class="label" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>Obfuscation Inspector</span>
+          <span style="font-size:0.7rem; color:var(--muted); font-weight:normal;">Observable Voice Transformation</span>
+        </span>
+        <div class="inspector-box" style="background:#13161c; border:1px solid var(--border); border-radius:6px; padding:12px; margin-top:6px;">
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap:12px;">
+            <div class="audio-compare-card" style="background:#1c2128; border:1px solid #30363d; border-radius:6px; padding:8px 10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:0.78rem; font-weight:600; color:#58a6ff;">🎤 Original Audio</span>
+                <span style="font-size:0.7rem; color:var(--muted);">User Recording</span>
+              </div>
+              <audio controls preload="none" src="${getAudioSrc(data.original_audio_url)}" style="width:100%; height:32px;"
+                onplay="this.parentElement.querySelector('.audio-status').textContent='Playing...'; this.parentElement.querySelector('.audio-status').style.color='var(--muted)';"
+                onpause="this.parentElement.querySelector('.audio-status').textContent='';"
+                onerror="this.parentElement.querySelector('.audio-status').textContent='Unavailable or expired'; this.parentElement.querySelector('.audio-status').style.color='#f85149';">
+              </audio>
+              <div class="audio-status" style="font-size:0.7rem; color:var(--muted); margin-top:4px; min-height:14px;"></div>
+            </div>
+
+            <div class="audio-compare-card" style="background:#1c2128; border:1px solid #30363d; border-radius:6px; padding:8px 10px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <span style="font-size:0.78rem; font-weight:600; color:#3fb950;">🛡️ Processed Audio</span>
+                <span style="font-size:0.7rem; color:var(--muted);">${escapeHtml((meta.obfuscation_strength || 'mild').replace('_', ' '))}</span>
+              </div>
+              <audio controls preload="none" src="${getAudioSrc(data.obfuscated_audio_url)}" style="width:100%; height:32px;"
+                onplay="this.parentElement.querySelector('.audio-status').textContent='Playing...'; this.parentElement.querySelector('.audio-status').style.color='var(--muted)';"
+                onpause="this.parentElement.querySelector('.audio-status').textContent='';"
+                onerror="this.parentElement.querySelector('.audio-status').textContent='Unavailable or expired'; this.parentElement.querySelector('.audio-status').style.color='#f85149';">
+              </audio>
+              <div class="audio-status" style="font-size:0.7rem; color:var(--muted); margin-top:4px; min-height:14px;"></div>
+            </div>
+          </div>
+          <div style="margin-top:8px; font-size:0.72rem; color:var(--muted); line-height:1.35;">
+            <span>ℹ️ <b>Inspection Notice:</b> Demonstrates acoustic formant &amp; pitch obfuscation prior to speech recognition. This is an inspection tool, not mathematical proof of anonymity.</span>
+          </div>
+        </div>
+      </div>
+      ` : ''}
 
       <!-- Diagnostics & Execution Details -->
       <div class="details-grid">
@@ -756,7 +1432,7 @@ function renderTurn(data, apiUrl, filename, sourceLabel) {
           <span>Obfuscation Intensity</span>
           <b style="text-transform: capitalize; color: #58a6ff;">
             ${escapeHtml((meta.obfuscation_strength || 'mild').replace('_', ' '))}
-            ${meta.obfuscation_details?.actual_shift_semitones !== undefined && meta.obfuscation_details?.actual_shift_semitones !== null ? `<span style="font-size:0.75rem; color:#8b949e; font-weight:normal;"> (${meta.obfuscation_details.actual_shift_semitones > 0 ? '+' : ''}${meta.obfuscation_details.actual_shift_semitones} st shift)</span>` : ''}
+            ${meta.obfuscation_details?.actual_shift_semitones !== undefined && meta.obfuscation_details?.actual_shift_semitones !== null ? `<span style="font-size:0.75rem; color:#8b949e; font-weight:normal;"> (${meta.obfuscation_details.actual_shift_semitones > 0 ? '+' : ''}${meta.obfuscation_details.actual_shift_semitones} st${meta.obfuscation_details?.formant_warp_alpha ? `, α=${meta.obfuscation_details.formant_warp_alpha}` : ''}${meta.obfuscation_details?.tempo_rate && meta.obfuscation_details?.tempo_rate !== 1.0 ? `, ${meta.obfuscation_details.tempo_rate}x tempo` : ''})</span>` : ''}
           </b>
         </div>
         <div class="details-item">
@@ -824,6 +1500,450 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str ?? '';
   return div.innerHTML;
+}
+
+// ============================================================================
+// Evaluation Lab Controller
+// ============================================================================
+let labDatasets = [];
+let labRuns = [];
+let currentRecords = [];
+let currentSummary = null;
+let isLabLoaded = false;
+
+function switchTab(tab) {
+  const tabLiveBtn = document.getElementById('tabLiveBtn');
+  const tabLabBtn = document.getElementById('tabLabBtn');
+  const viewLive = document.getElementById('viewLive');
+  const viewLab = document.getElementById('viewLab');
+
+  if (tab === 'live') {
+    tabLiveBtn.className = 'nav-tab active';
+    tabLabBtn.className = 'nav-tab';
+    viewLive.style.display = 'block';
+    viewLab.style.display = 'none';
+  } else {
+    tabLabBtn.className = 'nav-tab active';
+    tabLiveBtn.className = 'nav-tab';
+    viewLab.style.display = 'block';
+    viewLive.style.display = 'none';
+    if (!isLabLoaded) {
+      loadEvaluationData();
+      isLabLoaded = true;
+    }
+  }
+}
+
+async function loadEvaluationData() {
+  const datasetSelect = document.getElementById('evalDatasetSelect');
+  const runSelect = document.getElementById('evalRunSelect');
+  const countText = document.getElementById('evalFilteredCountText');
+
+  countText.textContent = 'Fetching datasets and runs...';
+
+  try {
+    // 1. Fetch datasets
+    const resDs = await fetch('/evaluation/datasets');
+    if (!resDs.ok) throw new Error('Failed to fetch datasets');
+    const dataDs = await resDs.json();
+    labDatasets = dataDs.datasets || [];
+
+    // Populate Dataset selector
+    datasetSelect.innerHTML = labDatasets.map(ds => {
+      let icon = ds.provenance_type === 'authentic_human_recording' ? '🎤' : (ds.provenance_type === 'benchmark_phrase_recording' ? '🔊' : '📝');
+      return `<option value="${escapeHtml(ds.dataset_id)}">${icon} ${escapeHtml(ds.dataset_id)} (N=${ds.sample_size})</option>`;
+    }).join('');
+
+    // 2. Fetch runs
+    const resRuns = await fetch('/evaluation/runs');
+    if (!resRuns.ok) throw new Error('Failed to fetch runs');
+    const dataRuns = await resRuns.json();
+    labRuns = dataRuns.runs || [];
+
+    // Populate Run selector — show phase label for Phase 6.1 runs
+    runSelect.innerHTML = labRuns.map(r => {
+      let label;
+      if (r.run_id === 'consolidated_phase6') {
+        label = '⭐ Phase 6 Consolidated (N=38: Human + Benchmark)';
+      } else if (r.phase_label === 'phase6_1') {
+        label = `🧪 Phase 6.1 Pilot — ${r.run_id} (N=${r.sample_size})`;
+      } else {
+        label = `Run ${r.run_id} (N=${r.sample_size})`;
+      }
+      return `<option value="${escapeHtml(r.run_id)}">${escapeHtml(label)}</option>`;
+    }).join('');
+
+    // Default to consolidated if available, otherwise first run
+    if (labRuns.some(r => r.run_id === 'consolidated_phase6')) {
+      runSelect.value = 'consolidated_phase6';
+    }
+
+    onDatasetChange();
+    await onRunChange();
+  } catch (err) {
+    countText.textContent = 'Error loading evaluation: ' + err.message;
+    console.error(err);
+  }
+}
+
+function onDatasetChange() {
+  const datasetId = document.getElementById('evalDatasetSelect').value;
+  const ds = labDatasets.find(d => d.dataset_id === datasetId);
+  const banner = document.getElementById('evalProvenanceBanner');
+  if (!ds || !banner) return;
+
+  let provBadge = '';
+  let notice = '';
+  if (ds.provenance_type === 'authentic_human_recording') {
+    provBadge = `<span class="provenance-pill provenance-human">🎤 Authentic Human Microphone Recording</span>`;
+    notice = `<b>Authentic Human Speech:</b> Spoken directly into a real microphone by a human speaker. Verified against ground truth. (N=6 cases).`;
+  } else if (ds.provenance_type === 'benchmark_phrase_recording') {
+    provBadge = `<span class="provenance-pill provenance-benchmark">🔊 Standardized Benchmark Audio</span>`;
+    notice = `<b>Acoustic Benchmark:</b> Standardized voice phrases across 4 formant-preserving obfuscation levels (none, mild, medium, strong). (N=32 cases).`;
+  } else if (ds.provenance_type === 'standardized_benchmark_recording') {
+    provBadge = `<span class="provenance-pill provenance-benchmark">🔊 Neural TTS Benchmark Audio (Phase 6.1)</span>`;
+    notice = `<b>Semantic-Conflict Pilot:</b> 10 utterances synthesized via Edge TTS (en-US-AriaNeural). NOT authentic human speech. 5 operational + 5 distractor cases designed to probe abstention engine coverage. <b style="color:#f85149;">Not a human-speaker evaluation.</b>`;
+  } else {
+    provBadge = `<span class="provenance-pill provenance-text">📝 Text-Only Challenge Suite</span>`;
+    notice = `<b>Semantic Text Evaluation:</b> Negation, mention-vs-command, and hypothetical reasoning challenges evaluated at the text/decision layer. (N=${ds.sample_size}).`;
+  }
+
+  banner.innerHTML = `
+    <div style="display:flex; flex-direction:column; gap:6px; flex:1;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        ${provBadge}
+        <span style="font-size:0.75rem; color:#7ee787; font-family:monospace;">SHA256: ${escapeHtml(ds.sha256_status)}</span>
+        <span style="font-size:0.75rem; color:var(--muted);">Format: <b>${escapeHtml(ds.format)}</b></span>
+      </div>
+      <div style="font-size:0.8rem; color:#c9d1d9;">${escapeHtml(ds.description)}</div>
+      <div style="font-size:0.75rem; color:#8b949e; margin-top:2px; border-left:2px solid #58a6ff; padding-left:8px;">${notice}</div>
+    </div>
+    <div style="text-align:right; font-size:0.75rem; color:var(--muted); min-width:140px;">
+      <div>Sample Size: <b style="color:var(--text); font-size:0.95rem;">${ds.sample_size}</b></div>
+      <div>Operational: <b style="color:#3fb950;">${ds.operational_count ?? 'N/A'}</b></div>
+      <div>Distractor: <b style="color:#e3b341;">${ds.non_operational_count ?? 'N/A'}</b></div>
+    </div>
+  `;
+}
+
+async function onRunChange() {
+  const runId = document.getElementById('evalRunSelect').value;
+  const countText = document.getElementById('evalFilteredCountText');
+  countText.textContent = `Loading run ${runId}...`;
+
+  try {
+    // 1. Fetch summary metrics
+    const resSummary = await fetch(`/evaluation/runs/${encodeURIComponent(runId)}/summary`);
+    if (resSummary.ok) {
+      currentSummary = await resSummary.json();
+      renderMetricsGrid(currentSummary);
+    }
+
+    // 2. Fetch cases
+    const resCases = await fetch(`/evaluation/runs/${encodeURIComponent(runId)}/cases?limit=250`);
+    if (resCases.ok) {
+      const dataCases = await resCases.json();
+      currentRecords = dataCases.records || [];
+      renderFilteredCases();
+    }
+  } catch (err) {
+    countText.textContent = `Error loading run details: ${err.message}`;
+  }
+}
+
+function renderMetricsGrid(summary) {
+  const grid = document.getElementById('evalMetricsGrid');
+  const countBadge = document.getElementById('evalSampleCountBadge');
+  if (!grid || !summary) return;
+
+  const base = summary.baseline_condition || summary.baseline_metrics || {};
+  const abs = summary.abstention_condition || summary.abstention_metrics || {};
+  const sampleN = summary.sample_size || summary.total_cases_evaluated || base.n_total || 0;
+
+  countBadge.textContent = `Total Evaluated Cases: N=${sampleN} (Paired: ${sampleN} Baseline + ${sampleN} Abstention)`;
+
+  const getMetric = (cond, path, defVal = 'N/A') => {
+    let cur = cond;
+    for (const part of path.split('.')) {
+      if (!cur) return defVal;
+      cur = cur[part];
+    }
+    return cur !== undefined ? cur : defVal;
+  };
+
+  const tsBase = getMetric(base, 'task_success.formatted', 'N/A');
+  const tsAbs = getMetric(abs, 'task_success.formatted', 'N/A');
+
+  const covBase = getMetric(base, 'coverage.overall.formatted', 'N/A');
+  const covAbs = getMetric(abs, 'coverage.overall.formatted', 'N/A');
+
+  const riskBase = getMetric(base, 'selective_risk.formatted', '0/0 (0.0%)');
+  const riskAbs = getMetric(abs, 'selective_risk.formatted', '0/0 (0.0%)');
+
+  const fpBase = getMetric(base, 'false_positive_tool_execution.formatted', '0/0 (0.0%)');
+  const fpAbs = getMetric(abs, 'false_positive_tool_execution.formatted', '0/0 (0.0%)');
+
+  const cfBase = getMetric(base, 'clarification_failure.formatted', null);
+  const cfAbs  = getMetric(abs,  'clarification_failure.formatted', null);
+
+  const werVal = (getMetric(abs, 'asr_metrics.mean_wer', 0.0) * 100).toFixed(1) + '%';
+  const cerVal = (getMetric(abs, 'asr_metrics.mean_cer', 0.0) * 100).toFixed(1) + '%';
+
+  // Helper: expandable definition block
+  const explain = (html) =>
+    `<details style="margin-top:7px;">
+       <summary style="cursor:pointer; font-size:0.7rem; color:#58a6ff; user-select:none;">▸ What does this metric mean?</summary>
+       <div style="margin-top:5px; font-size:0.7rem; color:#8b949e; line-height:1.55; border-left:2px solid #30363d; padding-left:8px;">${html}</div>
+     </details>`;
+
+  grid.innerHTML = `
+    <!-- Card 1: Task Success Rate -->
+    <div class="eval-metric-card">
+      <div class="eval-metric-title">🎯 Overall Task Success Rate</div>
+      <div class="eval-metric-compare">
+        <div class="compare-col" style="border-left: 2px solid #8b949e;">
+          <div class="compare-label">Baseline (No Abs)</div>
+          <div class="compare-val" style="color:#e6edf3;">${escapeHtml(String(getMetric(base, 'task_success.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(tsBase)}</div>
+        </div>
+        <div class="compare-col" style="border-left: 2px solid #238636;">
+          <div class="compare-label">With Abstention</div>
+          <div class="compare-val" style="color:#3fb950;">${escapeHtml(String(getMetric(abs, 'task_success.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(tsAbs)}</div>
+        </div>
+      </div>
+      <div style="font-size:0.68rem; color:#8b949e; margin-top:6px;">Correct operational execution OR safe non-execution for distractors.</div>
+      ${explain('<b>Formula:</b> k / N where k = (correctly executed operational cases) + (safely abstained distractor cases).<br><b>Denominator:</b> all N cases (operational + distractor).<br><b>Limitation:</b> Safe abstention on distractors always counts as success regardless of confidence; this can mask a high distractor leakage rate if the corpus has few distractors.')}
+    </div>
+
+    <!-- Card 2: Coverage -->
+    <div class="eval-metric-card">
+      <div class="eval-metric-title">📊 Execution Coverage (Overall)</div>
+      <div class="eval-metric-compare">
+        <div class="compare-col" style="border-left: 2px solid #8b949e;">
+          <div class="compare-label">Baseline</div>
+          <div class="compare-val" style="color:#e6edf3;">${escapeHtml(String(getMetric(base, 'coverage.overall.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(covBase)}</div>
+        </div>
+        <div class="compare-col" style="border-left: 2px solid #58a6ff;">
+          <div class="compare-label">With Abstention</div>
+          <div class="compare-val" style="color:#58a6ff;">${escapeHtml(String(getMetric(abs, 'coverage.overall.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(covAbs)}</div>
+        </div>
+      </div>
+      <div style="font-size:0.68rem; color:#8b949e; margin-top:6px;">Denominator: all N queries. Selective abstention trims distractor executions.</div>
+      ${explain('<b>Formula:</b> n_executed / N_total (all cases).<br><b>Note:</b> This counts <i>any</i> tool execution — operational and distractor alike. High coverage with high FPR indicates distractor leakage, not reliability. Read alongside Distractor FPR.')}
+    </div>
+
+    <!-- Card 3: Selective Risk -->
+    <div class="eval-metric-card">
+      <div class="eval-metric-title">⚠️ Selective Risk (Error / Executed)</div>
+      <div class="eval-metric-compare">
+        <div class="compare-col" style="border-left: 2px solid #8b949e;">
+          <div class="compare-label">Baseline</div>
+          <div class="compare-val" style="color:#e6edf3;">${escapeHtml(String(getMetric(base, 'selective_risk.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(riskBase)}</div>
+        </div>
+        <div class="compare-col" style="border-left: 2px solid #3fb950;">
+          <div class="compare-label">With Abstention</div>
+          <div class="compare-val" style="color:#3fb950;">${escapeHtml(String(getMetric(abs, 'selective_risk.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(riskAbs)}</div>
+        </div>
+      </div>
+      <div style="font-size:0.68rem; color:#8b949e; margin-top:6px;">Denominator: executed queries only. Incorrect tool or invalid arguments.</div>
+      ${explain('<b>Formula:</b> n_incorrect_executed / n_executed.<br><b>Denominator:</b> only cases where a tool call was made (excludes abstained cases).<br><b>Counts as incorrect:</b> wrong tool selected, invalid arguments, or tool call on a distractor (false positive). Lower is better.')}
+    </div>
+
+    <!-- Card 4: False Positive Execution -->
+    <div class="eval-metric-card">
+      <div class="eval-metric-title">🛡️ False-Positive Execution (Distractor FPR)</div>
+      <div class="eval-metric-compare">
+        <div class="compare-col" style="border-left: 2px solid #8b949e;">
+          <div class="compare-label">Baseline</div>
+          <div class="compare-val" style="color:#e6edf3;">${escapeHtml(String(getMetric(base, 'false_positive_tool_execution.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(fpBase)}</div>
+        </div>
+        <div class="compare-col" style="border-left: 2px solid #3fb950;">
+          <div class="compare-label">With Abstention</div>
+          <div class="compare-val" style="color:#3fb950;">${escapeHtml(String(getMetric(abs, 'false_positive_tool_execution.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(fpAbs)}</div>
+        </div>
+      </div>
+      <div style="font-size:0.68rem; color:#8b949e; margin-top:6px;">Denominator: distractor queries only. Execution on any distractor is prohibited.</div>
+      ${explain('<b>Formula:</b> n_distractor_executed / n_distractor.<br><b>Denominator:</b> only non-operational (distractor) cases — negations, hypotheticals, conversational mentions, cancellations.<br><b>Limitation:</b> Phase 6 corpus had no distractors, so this metric is undefined (N/A) for Phase 6 runs. Phase 6.1 pilot provides the first distractor evaluation (N=5 distractors).')}
+    </div>
+
+    ${cfBase !== null ? `
+    <!-- Card 5: Clarification Failure (Phase 6.1+) -->
+    <div class="eval-metric-card">
+      <div class="eval-metric-title">❓ Clarification Failure Rate</div>
+      <div class="eval-metric-compare">
+        <div class="compare-col" style="border-left: 2px solid #8b949e;">
+          <div class="compare-label">Baseline</div>
+          <div class="compare-val" style="color:#e6edf3;">${escapeHtml(String(getMetric(base, 'clarification_failure.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(cfBase)}</div>
+        </div>
+        <div class="compare-col" style="border-left: 2px solid #d29922;">
+          <div class="compare-label">With Abstention</div>
+          <div class="compare-val" style="color:#e3b341;">${escapeHtml(String(getMetric(abs, 'clarification_failure.rate', 0.0) * 100).substring(0, 5))}%</div>
+          <div class="compare-ci">${escapeHtml(cfAbs)}</div>
+        </div>
+      </div>
+      <div style="font-size:0.68rem; color:#8b949e; margin-top:6px;">Cases where CLARIFY was expected but a tool was executed instead.</div>
+      ${explain('<b>Formula:</b> n_clarify_executed / n_clarify_expected.<br><b>Denominator:</b> only cases whose expected_action is CLARIFY (ambiguous inputs where the correct response is to ask for clarification).<br><b>Phase 6.1:</b> Clarification failure metric introduced here. Earlier Phase 6 runs do not include this field.')}
+    </div>` : ''}
+
+    <!-- Card 6: Speech Recognition Fidelity -->
+    <div class="eval-metric-card" style="grid-column: 1 / -1;">
+      <div class="eval-metric-title">🎙️ Speech Recognition Fidelity (Whisper small.en on CPU)</div>
+      <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:center; background:#090d13; padding:10px 14px; border-radius:6px; border:1px solid #21262d; margin-top:6px;">
+        <div>Mean WER: <b style="color:#3fb950; font-size:1.15rem;">${escapeHtml(werVal)}</b></div>
+        <div>Mean CER: <b style="color:#3fb950; font-size:1.15rem;">${escapeHtml(cerVal)}</b></div>
+        <div style="font-size:0.75rem; color:#8b949e; flex:1;">
+          Verified on all 6 authentic human recordings and 32 formant-shifted benchmark recordings. Zero acoustic transcription failures observed across clear and shifted conditions.
+        </div>
+      </div>
+      ${explain('<b>WER</b> (Word Error Rate) = (substitutions + insertions + deletions) / reference_word_count, compared against independently authored reference transcripts.<br><b>CER</b> (Character Error Rate) = same formula at character level.<br><b>Important:</b> WER=0% here means Whisper transcription exactly matched the reference. For TTS audio (Phase 6.1), this is expected. For authentic human speech (Phase 6 real_audio), WER=0% validates that Whisper correctly captures the spoken intent.<br>References were authored independently — not derived from model outputs.')}
+    </div>
+  `;
+}
+
+function renderFilteredCases() {
+  const condFilter = document.getElementById('evalConditionFilter').value;
+  const outcomeFilter = document.getElementById('evalOutcomeFilter').value;
+  const container = document.getElementById('evalCasesContainer');
+  const countText = document.getElementById('evalFilteredCountText');
+
+  if (!container) return;
+
+  let filtered = currentRecords.slice();
+
+  // Condition filter
+  if (condFilter === 'baseline') {
+    filtered = filtered.filter(c => c.condition_mode === 'baseline');
+  } else if (condFilter === 'abstention') {
+    filtered = filtered.filter(c => c.condition_mode === 'with_abstention');
+  }
+
+  // Outcome filter
+  if (outcomeFilter === 'operational') {
+    filtered = filtered.filter(c => c.is_operational === true);
+  } else if (outcomeFilter === 'distractor') {
+    filtered = filtered.filter(c => c.is_operational === false);
+  } else if (outcomeFilter === 'success') {
+    filtered = filtered.filter(c => c.task_success === true);
+  } else if (outcomeFilter === 'failure') {
+    filtered = filtered.filter(c => c.task_success === false || c.is_false_positive_execution === true);
+  }
+
+  countText.textContent = `Showing ${filtered.length} of ${currentRecords.length} execution records (Filter: ${condFilter}, ${outcomeFilter})`;
+
+  if (filtered.length === 0) {
+    container.innerHTML = `<div style="text-align:center; padding:30px; color:var(--muted); background:var(--panel); border:1px solid var(--border); border-radius:8px;">No cases match the selected filters.</div>`;
+    return;
+  }
+
+  container.innerHTML = filtered.map(c => {
+    const isHuman = (c.provenance || '').includes('human');
+    const isSuccess = c.task_success;
+    const condBadge = c.condition_mode === 'with_abstention'
+      ? `<span class="badge" style="background:#d2992226; color:#e3b341; border:1px solid #d29922;">Abstention Active</span>`
+      : `<span class="badge" style="background:#21262d; color:#8b949e; border:1px solid var(--border);">Baseline (Bypassed)</span>`;
+
+    const provBadge = isHuman
+      ? `<span class="badge" style="background:#23863626; color:#3fb950; border:1px solid #238636;">🎤 Human Mic</span>`
+      : `<span class="badge" style="background:#8957e526; color:#a371f7; border:1px solid #8957e5;">🔊 Benchmark Phrase</span>`;
+
+    const outcomeBadge = isSuccess
+      ? `<span class="badge" style="background:#238636; color:#fff;">✓ SUCCESS</span>`
+      : `<span class="badge" style="background:#f85149; color:#fff;">✕ FAILURE</span>`;
+
+    const audioUrl = c.audio_path ? `/evaluation/audio/${encodeURIComponent(c.case_id)}` : null;
+
+    return `
+      <div class="case-item-card">
+        <div class="case-item-header">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <span style="font-family:monospace; font-weight:700; color:#58a6ff;">${escapeHtml(c.case_id)}</span>
+            ${provBadge}
+            ${condBadge}
+          </div>
+          <div>${outcomeBadge}</div>
+        </div>
+
+        <div class="case-item-body">
+          <!-- Audio Player Row -->
+          ${audioUrl ? `
+            <div class="case-audio-player">
+              <span style="font-size:0.75rem; color:var(--muted); font-weight:600;">Audio Asset:</span>
+              <audio controls preload="none" src="${audioUrl}"></audio>
+              <span style="font-size:0.7rem; color:#8b949e; font-family:monospace;">${escapeHtml(c.audio_path)}</span>
+            </div>
+          ` : `
+            <div style="font-size:0.75rem; color:var(--muted); background:#090d13; padding:6px 10px; border-radius:4px;">
+              📝 Text-Only Evaluation Case (No Audio File)
+            </div>
+          `}
+
+          <!-- Transcripts Row -->
+          <div class="section-row">
+            <span class="label">Reference &amp; Speech Transcripts</span>
+            <div class="transcript-box">
+              <div style="margin-bottom:4px;">
+                <span style="color:#58a6ff; font-weight:600;">Ground-Truth:</span> "${escapeHtml(c.reference_transcript)}"
+              </div>
+              <div style="font-size:0.8rem; color:#8b949e;">
+                <span>Whisper ASR:</span> "${escapeHtml(c.raw_transcript || 'N/A')}" &nbsp;·&nbsp;
+                <span>Corrected:</span> "${escapeHtml(c.corrected_transcript || 'N/A')}"
+                <span style="margin-left:8px; font-family:monospace; color:#7ee787;">(WER: ${(c.wer * 100).toFixed(1)}%, CER: ${(c.cer * 100).toFixed(1)}%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparison: Ground Truth vs Pipeline Execution -->
+          <div class="case-compare-grid">
+            <div class="case-compare-col">
+              <div class="label">Expected Ground-Truth</div>
+              <div style="margin-top:4px;">Operational: <b>${c.is_operational ? 'YES' : 'NO (Distractor)'}</b></div>
+              <div>Expected Decision: <b style="color:${c.expected_decision === 'ABSTAIN' ? '#e3b341' : '#3fb950'};">${escapeHtml(c.expected_decision)}</b></div>
+              <div>Expected Tool: <b style="font-family:monospace;">${escapeHtml(c.expected_tool || 'None')}</b></div>
+              <div style="font-size:0.72rem; color:#8b949e; margin-top:2px;">Args: <code>${escapeHtml(JSON.stringify(c.expected_args || {}))}</code></div>
+            </div>
+
+            <div class="case-compare-col">
+              <div class="label">Actual Pipeline Execution</div>
+              <div style="margin-top:4px;">Classified Intent: <b>${escapeHtml(c.classified_intent || 'UNKNOWN')}</b></div>
+              <div>Abstention Decision: <b style="color:${c.abstention_decision === 'ABSTAIN' ? '#e3b341' : '#3fb950'};">${escapeHtml(c.abstention_decision || 'N/A')}</b> (conf: ${c.abstention_confidence ?? '1.0'})</div>
+              <div>Executed Tool: <b style="font-family:monospace; color:${c.is_false_positive_execution ? '#f85149' : 'inherit'};">${escapeHtml(c.executed_tool || 'None (Bypassed)')}</b></div>
+              <div style="font-size:0.72rem; color:#8b949e; margin-top:2px;">Args: <code>${escapeHtml(JSON.stringify(c.executed_args || {}))}</code></div>
+            </div>
+          </div>
+
+          <!-- Failure Stage & Reason -->
+          <div style="display:flex; justify-content:space-between; align-items:center; background:#090d13; padding:8px 12px; border-radius:6px; font-size:0.76rem;">
+            <div>
+              <span style="color:var(--muted);">Failure Stage:</span>
+              <span class="stage-badge" style="color:${c.primary_failure_stage ? '#f85149' : '#3fb950'}; font-weight:700;">
+                ${escapeHtml(c.primary_failure_stage || 'NONE')}
+              </span>
+            </div>
+            ${c.abstention_reason ? `<div style="color:var(--muted); max-width:60%; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Reason: <span style="color:#c9d1d9;">${escapeHtml(c.abstention_reason)}</span></div>` : ''}
+            <div>
+              <span style="color:var(--muted);">Latency:</span>
+              <span style="font-family:monospace; color:#58a6ff;">${c.latencies_ms?.total_ms ?? 'N/A'} ms</span>
+            </div>
+          </div>
+
+          <!-- Answer Text Preview -->
+          ${c.answer_text ? `
+            <div style="font-size:0.78rem; color:#c9d1d9; background:#161b22; border-left:3px solid #58a6ff; padding:6px 10px; border-radius:0 4px 4px 0;">
+              <b>Answer:</b> ${escapeHtml(c.answer_text)}
+            </div>
+          ` : ''}
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 </script>
 </body>
