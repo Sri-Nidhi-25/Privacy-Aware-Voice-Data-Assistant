@@ -107,7 +107,7 @@ API JSON Response
 |   |   `-- voice.py               # VoiceQueryResponse, AudioValidation schemas
 |   |-- routers/
 |   |   |-- health.py              # GET /health/live, GET /health/ready (deep probe)
-|   |   |-- data.py                # GET /data/{source} -- direct data debug endpoint
+|   |   |-- data.py                # GET /data/{source} -- direct data inspection endpoint
 |   |   |-- evaluation.py          # GET /evaluation/* -- Evaluation Lab dashboard API
 |   |   `-- voice.py               # POST /voice/query -- main pipeline endpoint
 |   |-- services/
@@ -136,7 +136,6 @@ API JSON Response
 |   |-- customers.json             # Mock CRM records
 |   |-- support_tickets.json       # Mock support tickets
 |   |-- analytics.json             # Mock daily active user analytics
-|   |-- questions_and_answers.md   # Ground-truth queries, expected routing & answers
 |   `-- audio/                     # Canonical benchmark MPEG audio samples
 |-- evaluation/                    # Evaluation suite & benchmark runners
 |   |-- datasets/                  # Dev, challenge, distractor, adversarial test cases
@@ -188,7 +187,7 @@ Copy-Item .env.example .env
 
 Edit `.env` with your desired settings:
 ```env
-API_KEY=dev-insecure-key
+API_KEY=your-secret-api-key
 OBFUSCATION_STRENGTH=mild
 STT_MODEL=base
 OLLAMA_MODEL=llama3.2:latest
@@ -232,7 +231,7 @@ The app service automatically waits for Redis health checks to pass before bindi
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `API_KEY` | *(required)* | Server API key. UI uses `dev-insecure-key`. |
+| `API_KEY` | *(required)* | Server-side API key. Set a strong secret value; never commit to version control. |
 | `OBFUSCATION_STRENGTH` | `mild` | Global default obfuscation intensity (`mild`, `medium`, `strong`, `very_strong`). |
 | `STT_MODEL` | `base` | Whisper model name (`tiny`, `base`, `small`, `medium`, `large`). |
 | `OLLAMA_MODEL` | `llama3.2:latest` | Ollama model for correction guard + tool selection. |
