@@ -8,7 +8,7 @@ A privacy-aware, voice-first agentic data assistant combining acoustic voice obf
 
 > **Watch the full pipeline in action — live voice recording, obfuscation, Whisper STT, selective abstention, and TTS playback.**
 
-https://github.com/Sri-Nidhi-25/Privacy-Aware-Voice-Data-Assistant/raw/main/docs/demo.mp4
+https://sri-nidhi-25.vercel.app/projects/voice-assistant
 
 ---
 
