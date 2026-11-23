@@ -28,6 +28,18 @@ def test_api_unsupported_content_type(client: TestClient, valid_wav_file: Path):
     assert res.status_code == 400
 
 
+def test_api_webm_codecs_content_type_accepted(client: TestClient, valid_wav_file: Path):
+    # Tests that browser WebM recordings with codecs parameters (e.g. audio/webm;codecs=opus) pass MIME validation
+    with open(valid_wav_file, "rb") as f:
+        res = client.post(
+            "/voice/query",
+            files={"audio_file": ("test.webm", f, "audio/webm;codecs=opus")},
+            headers={"api-key": settings.API_KEY},
+        )
+    # Status code will not be 400 (unsupported content type)
+    assert res.status_code != 400 or "Unsupported audio type" not in res.text
+
+
 def test_api_undecodable_audio(client: TestClient, corrupt_audio_file: Path):
     with open(corrupt_audio_file, "rb") as f:
         res = client.post(

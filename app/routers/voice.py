@@ -345,11 +345,15 @@ async def voice_query(
             effective_enable_abstention = True
             log_event(logger, request_id, "security", "unauthorized_baseline_bypass_prevented")
 
-    if audio_file.content_type not in ALLOWED_CONTENT_TYPES:
-        log_event(logger, request_id, "validation", "invalid_content_type", content_type=audio_file.content_type)
+    raw_content_type = audio_file.content_type or ""
+    # Strip optional parameters like ';codecs=opus' or ';charset=utf-8' to extract the base MIME type
+    base_content_type = raw_content_type.split(";")[0].strip().lower()
+
+    if base_content_type not in ALLOWED_CONTENT_TYPES:
+        log_event(logger, request_id, "validation", "invalid_content_type", content_type=raw_content_type)
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported audio type: {audio_file.content_type}. Allowed: WAV, MP3, WebM, OGG",
+            detail=f"Unsupported audio type: {raw_content_type}. Allowed: WAV, MP3, WebM, OGG",
         )
 
     suffix_map = {
@@ -362,7 +366,7 @@ async def voice_query(
         "video/mpeg": ".mpeg",
         "audio/mp4": ".m4a",
     }
-    suffix = suffix_map.get(audio_file.content_type, ".wav")
+    suffix = suffix_map.get(base_content_type, ".wav")
 
     sem = get_audio_semaphore(request)
     async with sem:

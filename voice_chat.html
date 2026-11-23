@@ -797,11 +797,36 @@ let timerInterval = null, secondsElapsed = 0;
 let isRecording = false;
 
 // Audio Preview Handler
+let currentPreviewObjectUrl = null;
 function showAudioPreview(blobOrUrl) {
-  const url = typeof blobOrUrl === 'string' ? blobOrUrl : URL.createObjectURL(blobOrUrl);
+  if (currentPreviewObjectUrl) {
+    try { URL.revokeObjectURL(currentPreviewObjectUrl); } catch (_) {}
+    currentPreviewObjectUrl = null;
+  }
+  let url;
+  if (typeof blobOrUrl === 'string') {
+    url = blobOrUrl;
+  } else {
+    // Ensure clean audio/webm MIME type so HTML5 <audio> decodes it reliably
+    const mime = (blobOrUrl.type || 'audio/webm').split(';')[0];
+    const cleanBlob = new Blob([blobOrUrl], { type: mime });
+    url = URL.createObjectURL(cleanBlob);
+    currentPreviewObjectUrl = url;
+  }
   previewAudio.src = url;
   previewAudio.load();
   audioPreview.classList.add('visible');
+
+  // Fix Chromium/Edge MediaRecorder missing duration issue
+  previewAudio.onloadedmetadata = () => {
+    if (previewAudio.duration === Infinity) {
+      previewAudio.currentTime = 1e101;
+      previewAudio.ontimeupdate = () => {
+        previewAudio.ontimeupdate = null;
+        previewAudio.currentTime = 0;
+      };
+    }
+  };
 }
 
 // Stage Tracker Visuals
@@ -1152,6 +1177,15 @@ async function sendAudio(blobOrFile, filename, sourceLabel) {
     finalizeStageTracker(data.metadata || {});
     statusBar.textContent = `Completed in ${Math.round(performance.now() - tStart)} ms`;
     renderTurn(data, apiUrl, filename, sourceLabel);
+
+    // Upgrade the top Audio Input Preview player to the server's normalized, fully-seekable WAV stream
+    if (data.original_audio_url) {
+      const base = apiUrl.split('/voice/query')[0];
+      const full = `${base}${data.original_audio_url}`;
+      const sep = full.includes('?') ? '&' : '?';
+      const cleanUrl = full.includes('api_key=') ? full : `${full}${sep}api_key=${encodeURIComponent(apiKey)}`;
+      showAudioPreview(cleanUrl);
+    }
   } catch (err) {
     statusBar.textContent = 'Pipeline Failure: ' + err.message;
     statusBar.classList.add('error');
